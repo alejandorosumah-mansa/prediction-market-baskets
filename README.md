@@ -1,151 +1,94 @@
-# Prediction Market Basket Construction
+# Prediction Market Ticker Generation
 
-This repository presents a clean analysis of prediction market data to construct tradeable market baskets. The analysis processes over 20,000 prediction markets across multiple platforms to identify coherent themes and build correlation-based market clusters.
+Build continuous time series from prediction market contracts by mapping individual contracts (CUSIPs) to recurring concepts (Tickers) and chaining them across expirations.
 
-## Quick Start
+## The Problem
+
+Prediction market contracts are ephemeral. "Will the Fed cut 25bps in March 2026?" expires in March. "Will the Fed cut 25bps in June 2026?" is a different contract. But they ask the same recurring question. To do any meaningful time series analysis, you need to chain these together, like futures continuous contracts.
+
+## The Taxonomy
+
+```
+Theme ("Central Banks & Monetary Policy")
+  └── Event ("Fed Rate Decision")
+       └── Ticker ("Will Fed cut 25bps?")          ← recurring concept, no expiration
+            └── CUSIP ("Will Fed cut 25bps in March 2026?")  ← specific contract with expiration
+```
+
+- **CUSIP**: Individual contract with an expiration date. What Polymarket calls a "market."
+- **Ticker**: The recurring question that spawns new CUSIPs over time.
+- **Event**: Groups related Tickers (e.g., different rate outcomes for the same meeting).
+- **Theme**: Macro category (elections, crypto, geopolitics, etc.).
+
+## What This Does
+
+`python run.py` takes ~20K raw prediction market contracts and:
+
+1. **Classifies** markets into 19 themes (LLM, cached)
+2. **Filters** out sports and entertainment (60%+ of all markets)
+3. **Maps CUSIPs → Tickers** using regex normalization + exact matching
+4. **Builds continuous time series** for each rollable Ticker:
+   - **Raw levels**: front-month rolling, price jumps at roll points preserved
+   - **Adjusted series**: return-chained (like adjusted close), continuous for correlation work
+5. **Outputs** everything to `output/`
+
+## Output
+
+```
+output/
+├── charts/
+│   ├── 01_category_distribution.png      # Markets by theme
+│   ├── 02_ticker_cusip_distribution.png  # CUSIPs per Ticker
+│   ├── 03_sample_timeseries_fed.png      # Fed rate Ticker series
+│   ├── 04_sample_timeseries_crypto.png   # Bitcoin/crypto Ticker series
+│   ├── 05_sample_timeseries_politics.png # Election Ticker series
+│   ├── 06_sample_timeseries_geopolitics.png # Iran/conflict series
+│   ├── 07_roll_points_analysis.png       # Roll behavior across Tickers
+│   └── 08_coverage_timeline.png          # Data coverage over time
+└── results.xlsx
+    ├── Summary                           # Pipeline stats
+    ├── Ticker Mapping                    # All Tickers with CUSIP counts
+    ├── Ticker Chains                     # Roll chains per Ticker
+    ├── Time Series Stats                 # Duration, rolls, data points per Ticker
+    └── Market Classifications            # All 20K markets categorized
+```
+
+## How to Run
 
 ```bash
 python run.py
 ```
 
-This single script reproduces the entire analysis and generates:
-- **10 publication-quality charts** in `output/charts/`
-- **Comprehensive Excel file** with 6 analysis sheets in `output/results.xlsx`
+Requires: `pandas`, `numpy`, `matplotlib`, `openpyxl`, `openai` (for classification cache)
 
-## What It Produces
-
-### Charts Generated
-1. **Market Filter Funnel** - How many markets survive each filtering stage
-2. **Category Distribution** - Market counts by classified themes
-3. **Ticker CUSIP Distribution** - Number of underlying contracts per ticker
-4. **Correlation Distribution** - Histogram of pairwise ticker correlations
-5. **Top Correlated Pairs** - Most correlated ticker pairs
-6. **Community Sizes** - Number of tickers per identified cluster
-7. **Community Themes** - Thematic analysis of clusters
-8. **Sample Time Series** - Representative ticker price movements
-9. **Roll Analysis** - Contract rollover patterns
-10. **Cross-Community Correlations** - Inter-cluster correlation heatmap
-
-### Excel Output Sheets
-- **Summary** - Key metrics and data pipeline statistics
-- **Ticker Mapping** - All tickers with CUSIP counts and categories
-- **Ticker Time Series** - Statistical summary of each ticker's data
-- **Communities** - Cluster definitions and top constituent tickers
-- **Correlation Stats** - Distribution statistics of correlation matrix
-- **Market Classifications** - All 20K markets with assigned categories
-
-## Methodology
-
-### Taxonomy Structure
-The analysis uses a hierarchical classification system:
-- **Theme** → Broad category (e.g., "Elections", "Crypto", "Fed Policy")
-- **Event** → Specific occurrence (e.g., "2024 Presidential Election")
-- **Ticker** → Tradeable instrument (e.g., "TRUMP2024")
-- **CUSIP** → Individual market contract with expiry date
-
-### Data Pipeline
-Starting with **20,180 raw prediction markets**, the pipeline applies:
-
-1. **Platform Integration** - Aggregates markets from Kalshi, Polymarket, Metaculus
-2. **Date Filtering** - Removes markets without clear end dates
-3. **Volume Filtering** - Excludes low-volume, illiquid markets
-4. **Classification** - LLM-powered thematic categorization
-5. **Ticker Mapping** - Groups related markets into common instruments
-6. **Quality Control** - Validates data consistency and completeness
-
-Final dataset contains **~18,000 high-quality markets** mapped to **~1,900 unique tickers**.
-
-### Ticker Mapping Methodology
-Markets are aggregated into tickers using:
-- **Event commonality** - Markets about the same underlying event
-- **Temporal coherence** - Contracts with related expiry dates
-- **Semantic similarity** - NLP-based title and description matching
-- **Platform reconciliation** - Cross-platform instrument identification
-
-This creates continuous time series for each ticker by rolling between individual CUSIP contracts.
-
-### Continuous Time Series Construction
-For each ticker, the system:
-1. **Identifies roll points** - When to switch between expiring contracts
-2. **Price adjustment** - Maintains price continuity across rolls
-3. **Volume aggregation** - Combines trading activity across contracts
-4. **Gap filling** - Interpolates missing data points where appropriate
-
-### Correlation Matrix (Quality Filters)
-Pairwise correlations are computed with filters:
-- **Minimum overlap** - Tickers must have ≥30 days of shared trading
-- **Volume threshold** - Exclude periods with minimal trading activity
-- **Outlier removal** - Filter extreme price movements that distort correlations
-- **Stationarity checks** - Focus on price returns rather than levels
-
-Final correlation matrix: **1,679 × 1,679 tickers** with high-quality overlap.
-
-### Clustering Methodology
-Market baskets are identified using:
-- **Hybrid clustering** - Combines correlation-based and semantic approaches
-- **Community detection** - Network-based algorithms on correlation graphs
-- **Thematic coherence** - Validates clusters match intuitive market themes
-- **Size balancing** - Ensures clusters are tradeable (not too large/small)
-
-Result: **174 market communities** ranging from specific events (elections) to broad themes (crypto markets).
+Data source: `../basket-engine/data/` (raw market data and processed caches)
 
 ## Key Results
 
-### Market Coverage
-- **18,000+ markets** successfully processed and categorized
-- **95%+ classification accuracy** via human validation sampling
-- **1,900 unique tickers** identified across all platforms
-- **174 coherent market communities** for basket construction
+- **20,180 markets** ingested from Polymarket + Kalshi
+- **16,840 unique Tickers** identified
+- **2,009 rollable Tickers** (2+ CUSIPs)
+- **255 Tickers** with continuous time series (30+ days)
+- **41,539 data points** spanning Jan 2024 – Feb 2026
+- **228 roll points** identified and handled
 
-### Correlation Structure
-- **Median correlation**: 0.089 (weak but meaningful relationships)
-- **Strong correlations (>0.5)**: 8.3% of pairs (see Chart 5)
-- **Negative correlations**: 23% of pairs (valuable for hedging)
-- **Community correlation**: Within-cluster correlations 3x higher than between-cluster
+## Methodology
 
-### Time Series Quality
-- **Average ticker duration**: 180 days of active trading
-- **Roll frequency**: 2.3 rolls per ticker on average
-- **Data completeness**: 87% daily coverage for active periods
-- **Volume consistency**: Stable trading patterns across most tickers
+### Ticker Mapping
+1. Strip time-specific parts from titles (months, years, meeting dates) via regex
+2. Normalize format variants ("Will the Fed decrease" → "Fed decrease", "$150K" → "$150,000")
+3. Exact string match on normalized titles (no fuzzy matching to avoid merging different outcomes)
+4. Sort CUSIPs by expiration date to build roll chains
 
-### Notable Findings
-- **Election markets** show highest internal correlation (0.34 median)
-- **Crypto markets** exhibit strong momentum clustering
-- **Fed policy markets** demonstrate clear policy cycles
-- **Geopolitical events** cluster by geographic region
-- **AI/Tech markets** emerging as distinct thematic category
-
-*See Charts 6-10 for detailed community analysis and cross-correlations.*
+### Continuous Time Series
+- **Front-month rolling**: always hold the nearest-expiry active CUSIP
+- **Roll trigger**: contract resolves or reaches expiration
+- **Adjusted series**: daily probability changes chained continuously (returns, not levels)
+- **Roll day treatment**: return = 0 at roll point (avoids artificial jumps)
 
 ## Limitations
 
-### Data Constraints
-- **Platform coverage** - Limited to major prediction market platforms
-- **Historical depth** - Analysis covers 2023-2024 period only
-- **Survivorship bias** - Focuses on markets with sufficient trading activity
-- **Resolution accuracy** - Dependent on platform resolution mechanisms
-
-### Methodological Limitations
-- **Classification subjectivity** - LLM categorization may miss nuanced themes
-- **Correlation assumptions** - Relationships may be non-linear or time-varying
-- **Clustering stability** - Community assignments sensitive to parameter choices
-- **Roll point identification** - Automated detection may miss optimal switch times
-
-### Market Structure
-- **Liquidity constraints** - Many tickers have limited trading depth
-- **Platform fragmentation** - Same events may trade differently across platforms
-- **Regulatory uncertainty** - Market availability subject to jurisdictional changes
-- **Manipulation risk** - Small markets vulnerable to coordinated activity
-
-## Future Enhancements
-
-- **Real-time updating** - Live data feeds for dynamic basket rebalancing
-- **Cross-platform arbitrage** - Exploit price differences between platforms  
-- **Sentiment integration** - Incorporate news and social media signals
-- **Risk model** - Value-at-Risk calculations for basket positions
-- **Backtesting framework** - Historical performance analysis of basket strategies
-
----
-
-*This analysis was generated from data processed in the companion `basket-engine` repository. The clean presentation here focuses on results and insights rather than implementation details.*
+- 71% of rollable Tickers lack candle data files (Polymarket data gap)
+- Sports markets dominate by count (12K of 20K) but are filtered out
+- Title format changes across years require ongoing regex maintenance
+- "reach" vs "hit" in Bitcoin titles creates duplicate Tickers (edge case)

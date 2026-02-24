@@ -1,0 +1,2832 @@
+{
+  "ticker_000009": {
+    "ticker_name": "1 Fed rate cut happen?",
+    "cusip_count": 2,
+    "data_points": 419,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000230": {
+    "ticker_name": "2 Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 419,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000241": {
+    "ticker_name": "3 Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 418,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000243": {
+    "ticker_name": "4 Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 419,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000291": {
+    "ticker_name": "5 Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 419,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000296": {
+    "ticker_name": "6 Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 419,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000299": {
+    "ticker_name": "7 Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 179,
+    "duration_days": 178,
+    "roll_count": 5,
+    "start_date": "2025-08-26",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000374": {
+    "ticker_name": "AI Industry Downturn by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 93,
+    "duration_days": 92,
+    "roll_count": 0,
+    "start_date": "2025-11-21",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000660": {
+    "ticker_name": "Alibaba have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 1,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000693": {
+    "ticker_name": "Alphabet be the largest company in the world by market cap on 30?",
+    "cusip_count": 2,
+    "data_points": 134,
+    "duration_days": 133,
+    "roll_count": 1,
+    "start_date": "2025-10-11",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000694": {
+    "ticker_name": "Alphabet be the largest company in the world by market cap on 31?",
+    "cusip_count": 3,
+    "data_points": 418,
+    "duration_days": 417,
+    "roll_count": 1,
+    "start_date": "2024-12-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000720": {
+    "ticker_name": "Amazon be the largest company in the world by market cap on 31?",
+    "cusip_count": 3,
+    "data_points": 179,
+    "duration_days": 179,
+    "roll_count": 11,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000916": {
+    "ticker_name": "Another US strike on Venezuela by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 48,
+    "duration_days": 47,
+    "roll_count": 1,
+    "start_date": "2026-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_000980": {
+    "ticker_name": "Anthropic have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 1,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001037": {
+    "ticker_name": "Apple be the largest company in the world by market cap on 31?",
+    "cusip_count": 3,
+    "data_points": 418,
+    "duration_days": 417,
+    "roll_count": 1,
+    "start_date": "2024-12-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001085": {
+    "ticker_name": "Arizona Diamondbacks win the World Series?",
+    "cusip_count": 2,
+    "data_points": 213,
+    "duration_days": 212,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-27",
+    "category": ""
+  },
+  "ticker_001099": {
+    "ticker_name": "Armenia win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_001124": {
+    "ticker_name": "Artemis II launch by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 32,
+    "duration_days": 31,
+    "roll_count": 0,
+    "start_date": "2026-01-21",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001175": {
+    "ticker_name": "Athletics win the World Series?",
+    "cusip_count": 2,
+    "data_points": 204,
+    "duration_days": 203,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-18",
+    "category": ""
+  },
+  "ticker_001184": {
+    "ticker_name": "Atlanta Hawks win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 384,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001286": {
+    "ticker_name": "Azerbaijan win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 100,
+    "duration_days": 99,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-14",
+    "category": ""
+  },
+  "ticker_001335": {
+    "ticker_name": "Bad Bunny be the top Spotify artist for ?",
+    "cusip_count": 2,
+    "data_points": 120,
+    "duration_days": 119,
+    "roll_count": 0,
+    "start_date": "2025-08-06",
+    "end_date": "2025-12-03",
+    "category": ""
+  },
+  "ticker_001342": {
+    "ticker_name": "Baidu have the best AI model at the end of ?",
+    "cusip_count": 2,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 1,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001352": {
+    "ticker_name": "Balance of Power: Other",
+    "cusip_count": 2,
+    "data_points": 412,
+    "duration_days": 667,
+    "roll_count": 1,
+    "start_date": "2024-04-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001363": {
+    "ticker_name": "Baltimore Orioles win the World Series?",
+    "cusip_count": 2,
+    "data_points": 235,
+    "duration_days": 359,
+    "roll_count": 1,
+    "start_date": "2025-02-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001401": {
+    "ticker_name": "Bank of Japan decrease interest rates after meeting?",
+    "cusip_count": 2,
+    "data_points": 61,
+    "duration_days": 60,
+    "roll_count": 0,
+    "start_date": "2025-12-23",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001402": {
+    "ticker_name": "Bank of Japan increase interest rates by 25 bps after meeting?",
+    "cusip_count": 2,
+    "data_points": 57,
+    "duration_days": 60,
+    "roll_count": 0,
+    "start_date": "2025-12-23",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001434": {
+    "ticker_name": "Base launch a token by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 94,
+    "duration_days": 93,
+    "roll_count": 1,
+    "start_date": "2025-11-20",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001790": {
+    "ticker_name": "Bitcoin all time high by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 67,
+    "duration_days": 66,
+    "roll_count": 0,
+    "start_date": "2025-12-17",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001791": {
+    "ticker_name": "Bitcoin all time high by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 32,
+    "duration_days": 32,
+    "roll_count": 1,
+    "start_date": "2024-12-31",
+    "end_date": "2025-02-01",
+    "category": ""
+  },
+  "ticker_001794": {
+    "ticker_name": "Bitcoin dip to $100,000?",
+    "cusip_count": 4,
+    "data_points": 85,
+    "duration_days": 161,
+    "roll_count": 3,
+    "start_date": "2025-05-31",
+    "end_date": "2025-11-08",
+    "category": ""
+  },
+  "ticker_001799": {
+    "ticker_name": "Bitcoin dip to $20,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 367,
+    "duration_days": 366,
+    "roll_count": 0,
+    "start_date": "2024-12-31",
+    "end_date": "2026-01-01",
+    "category": ""
+  },
+  "ticker_001805": {
+    "ticker_name": "Bitcoin dip to $40,000?",
+    "cusip_count": 2,
+    "data_points": 51,
+    "duration_days": 50,
+    "roll_count": 1,
+    "start_date": "2026-01-02",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001809": {
+    "ticker_name": "Bitcoin dip to $50,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 376,
+    "duration_days": 417,
+    "roll_count": 1,
+    "start_date": "2024-12-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001823": {
+    "ticker_name": "Bitcoin dip to $70,000?",
+    "cusip_count": 3,
+    "data_points": 63,
+    "duration_days": 309,
+    "roll_count": 2,
+    "start_date": "2025-04-02",
+    "end_date": "2026-02-05",
+    "category": ""
+  },
+  "ticker_001826": {
+    "ticker_name": "Bitcoin dip to $75,000?",
+    "cusip_count": 2,
+    "data_points": 60,
+    "duration_days": 91,
+    "roll_count": 1,
+    "start_date": "2025-11-02",
+    "end_date": "2026-02-01",
+    "category": ""
+  },
+  "ticker_001829": {
+    "ticker_name": "Bitcoin dip to $80,000?",
+    "cusip_count": 2,
+    "data_points": 60,
+    "duration_days": 91,
+    "roll_count": 1,
+    "start_date": "2025-11-02",
+    "end_date": "2026-02-01",
+    "category": ""
+  },
+  "ticker_001830": {
+    "ticker_name": "Bitcoin dip to $85,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 54,
+    "duration_days": 54,
+    "roll_count": 1,
+    "start_date": "2025-01-03",
+    "end_date": "2025-02-26",
+    "category": ""
+  },
+  "ticker_001831": {
+    "ticker_name": "Bitcoin dip to $85,000?",
+    "cusip_count": 2,
+    "data_points": 49,
+    "duration_days": 89,
+    "roll_count": 1,
+    "start_date": "2025-11-02",
+    "end_date": "2026-01-30",
+    "category": ""
+  },
+  "ticker_001832": {
+    "ticker_name": "Bitcoin dip to $90,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 72,
+    "duration_days": 290,
+    "roll_count": 1,
+    "start_date": "2025-02-01",
+    "end_date": "2025-11-18",
+    "category": ""
+  },
+  "ticker_001833": {
+    "ticker_name": "Bitcoin dip to $90,000?",
+    "cusip_count": 3,
+    "data_points": 77,
+    "duration_days": 200,
+    "roll_count": 2,
+    "start_date": "2025-05-01",
+    "end_date": "2025-11-18",
+    "category": ""
+  },
+  "ticker_001835": {
+    "ticker_name": "Bitcoin dip to $95,000?",
+    "cusip_count": 2,
+    "data_points": 43,
+    "duration_days": 167,
+    "roll_count": 1,
+    "start_date": "2025-05-31",
+    "end_date": "2025-11-14",
+    "category": ""
+  },
+  "ticker_001841": {
+    "ticker_name": "Bitcoin hit $100,000?",
+    "cusip_count": 2,
+    "data_points": 276,
+    "duration_days": 275,
+    "roll_count": 2,
+    "start_date": "2024-03-05",
+    "end_date": "2024-12-05",
+    "category": ""
+  },
+  "ticker_001842": {
+    "ticker_name": "Bitcoin hit $150,000 by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 198,
+    "duration_days": 197,
+    "roll_count": 4,
+    "start_date": "2025-08-08",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001847": {
+    "ticker_name": "Bitcoin outperform Gold?",
+    "cusip_count": 2,
+    "data_points": 53,
+    "duration_days": 52,
+    "roll_count": 0,
+    "start_date": "2025-12-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001851": {
+    "ticker_name": "Bitcoin reach $1,000,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 130,
+    "duration_days": 129,
+    "roll_count": 0,
+    "start_date": "2025-08-25",
+    "end_date": "2026-01-01",
+    "category": ""
+  },
+  "ticker_001853": {
+    "ticker_name": "Bitcoin reach $100,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 96,
+    "duration_days": 94,
+    "roll_count": 1,
+    "start_date": "2025-11-18",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001854": {
+    "ticker_name": "Bitcoin reach $100,000?",
+    "cusip_count": 3,
+    "data_points": 79,
+    "duration_days": 325,
+    "roll_count": 2,
+    "start_date": "2025-04-02",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001856": {
+    "ticker_name": "Bitcoin reach $105,000?",
+    "cusip_count": 4,
+    "data_points": 83,
+    "duration_days": 466,
+    "roll_count": 3,
+    "start_date": "2024-11-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001857": {
+    "ticker_name": "Bitcoin reach $110,000 by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 147,
+    "duration_days": 414,
+    "roll_count": 3,
+    "start_date": "2025-01-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001859": {
+    "ticker_name": "Bitcoin reach $110,000?",
+    "cusip_count": 7,
+    "data_points": 146,
+    "duration_days": 464,
+    "roll_count": 6,
+    "start_date": "2024-11-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001861": {
+    "ticker_name": "Bitcoin reach $115,000?",
+    "cusip_count": 5,
+    "data_points": 141,
+    "duration_days": 296,
+    "roll_count": 4,
+    "start_date": "2025-05-01",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001863": {
+    "ticker_name": "Bitcoin reach $120,000 by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 133,
+    "duration_days": 414,
+    "roll_count": 2,
+    "start_date": "2025-01-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001865": {
+    "ticker_name": "Bitcoin reach $120,000?",
+    "cusip_count": 7,
+    "data_points": 181,
+    "duration_days": 445,
+    "roll_count": 6,
+    "start_date": "2024-12-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001866": {
+    "ticker_name": "Bitcoin reach $125,000?",
+    "cusip_count": 5,
+    "data_points": 132,
+    "duration_days": 296,
+    "roll_count": 4,
+    "start_date": "2025-05-01",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001867": {
+    "ticker_name": "Bitcoin reach $130,000 by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 206,
+    "duration_days": 414,
+    "roll_count": 2,
+    "start_date": "2025-01-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001869": {
+    "ticker_name": "Bitcoin reach $130,000?",
+    "cusip_count": 4,
+    "data_points": 119,
+    "duration_days": 425,
+    "roll_count": 3,
+    "start_date": "2024-12-03",
+    "end_date": "2026-02-01",
+    "category": ""
+  },
+  "ticker_001872": {
+    "ticker_name": "Bitcoin reach $140,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 177,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001873": {
+    "ticker_name": "Bitcoin reach $150,000 by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 236,
+    "duration_days": 414,
+    "roll_count": 3,
+    "start_date": "2025-01-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001875": {
+    "ticker_name": "Bitcoin reach $150,000?",
+    "cusip_count": 8,
+    "data_points": 231,
+    "duration_days": 296,
+    "roll_count": 7,
+    "start_date": "2025-05-01",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001877": {
+    "ticker_name": "Bitcoin reach $170,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 181,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001880": {
+    "ticker_name": "Bitcoin reach $200,000 by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 231,
+    "duration_days": 414,
+    "roll_count": 3,
+    "start_date": "2025-01-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001882": {
+    "ticker_name": "Bitcoin reach $200,000?",
+    "cusip_count": 7,
+    "data_points": 208,
+    "duration_days": 243,
+    "roll_count": 6,
+    "start_date": "2025-04-02",
+    "end_date": "2025-12-01",
+    "category": ""
+  },
+  "ticker_001883": {
+    "ticker_name": "Bitcoin reach $250,000 by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 181,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001895": {
+    "ticker_name": "Bitcoin reach $85,000?",
+    "cusip_count": 2,
+    "data_points": 50,
+    "duration_days": 445,
+    "roll_count": 1,
+    "start_date": "2024-12-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001897": {
+    "ticker_name": "Bitcoin reach $90,000?",
+    "cusip_count": 4,
+    "data_points": 79,
+    "duration_days": 476,
+    "roll_count": 3,
+    "start_date": "2024-11-02",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001900": {
+    "ticker_name": "Bitcoin reach $95,000?",
+    "cusip_count": 4,
+    "data_points": 68,
+    "duration_days": 466,
+    "roll_count": 3,
+    "start_date": "2024-11-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_001974": {
+    "ticker_name": "Boston Celtics win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 476,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_002204": {
+    "ticker_name": "Brooklyn Nets win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 363,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_002249": {
+    "ticker_name": "Bruno Mars be the top Spotify artist for ?",
+    "cusip_count": 2,
+    "data_points": 99,
+    "duration_days": 101,
+    "roll_count": 0,
+    "start_date": "2025-08-25",
+    "end_date": "2025-12-04",
+    "category": ""
+  },
+  "ticker_002804": {
+    "ticker_name": "Charlotte Hornets win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 359,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_002865": {
+    "ticker_name": "Chicago Bulls win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 380,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_002868": {
+    "ticker_name": "Chicago White Sox win the World Series?",
+    "cusip_count": 2,
+    "data_points": 193,
+    "duration_days": 192,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-07",
+    "category": ""
+  },
+  "ticker_002924": {
+    "ticker_name": "China invade Taiwan by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 89,
+    "duration_days": 88,
+    "roll_count": 4,
+    "start_date": "2025-11-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_002926": {
+    "ticker_name": "China invade Taiwan?",
+    "cusip_count": 2,
+    "data_points": 478,
+    "duration_days": 716,
+    "roll_count": 1,
+    "start_date": "2024-01-16",
+    "end_date": "2026-01-01",
+    "category": ""
+  },
+  "ticker_003037": {
+    "ticker_name": "Cincinnati Reds win the World Series?",
+    "cusip_count": 2,
+    "data_points": 218,
+    "duration_days": 217,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-10-02",
+    "category": ""
+  },
+  "ticker_003051": {
+    "ticker_name": "Claude 5 be released by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 198,
+    "duration_days": 197,
+    "roll_count": 1,
+    "start_date": "2025-08-08",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_003089": {
+    "ticker_name": "Cleveland Cavaliers win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 475,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_003222": {
+    "ticker_name": "Colorado Rockies win the World Series?",
+    "cusip_count": 2,
+    "data_points": 179,
+    "duration_days": 178,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-08-24",
+    "category": ""
+  },
+  "ticker_003347": {
+    "ticker_name": "Consensys IPO by [timeframe] ?",
+    "cusip_count": 4,
+    "data_points": 107,
+    "duration_days": 108,
+    "roll_count": 0,
+    "start_date": "2025-11-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_003515": {
+    "ticker_name": "Croatia win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 177,
+    "duration_days": 382,
+    "roll_count": 1,
+    "start_date": "2025-02-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_003625": {
+    "ticker_name": "Dallas Mavericks win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 450,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_003873": {
+    "ticker_name": "DeepSeek have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 5,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004035": {
+    "ticker_name": "Denmark win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_004050": {
+    "ticker_name": "Denver Nuggets win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 480,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004124": {
+    "ticker_name": "Detroit Pistons win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 463,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004316": {
+    "ticker_name": "Donald Trump win the Nobel Peace Prize?",
+    "cusip_count": 2,
+    "data_points": 174,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004318": {
+    "ticker_name": "Donald Trump win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 523,
+    "duration_days": 778,
+    "roll_count": 1,
+    "start_date": "2024-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004385": {
+    "ticker_name": "Drake be the top Spotify artist for ?",
+    "cusip_count": 2,
+    "data_points": 120,
+    "duration_days": 119,
+    "roll_count": 0,
+    "start_date": "2025-08-06",
+    "end_date": "2025-12-03",
+    "category": ""
+  },
+  "ticker_004901": {
+    "ticker_name": "Estonia win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_004942": {
+    "ticker_name": "Ethereum all time high by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 67,
+    "duration_days": 66,
+    "roll_count": 0,
+    "start_date": "2025-12-17",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004943": {
+    "ticker_name": "Ethereum all time high by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 210,
+    "duration_days": 305,
+    "roll_count": 2,
+    "start_date": "2024-12-31",
+    "end_date": "2025-11-01",
+    "category": ""
+  },
+  "ticker_004944": {
+    "ticker_name": "Ethereum all time high?",
+    "cusip_count": 3,
+    "data_points": 324,
+    "duration_days": 323,
+    "roll_count": 3,
+    "start_date": "2024-02-13",
+    "end_date": "2025-01-01",
+    "category": ""
+  },
+  "ticker_004993": {
+    "ticker_name": "Ethereum reach $4,000?",
+    "cusip_count": 3,
+    "data_points": 68,
+    "duration_days": 466,
+    "roll_count": 2,
+    "start_date": "2024-11-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_004998": {
+    "ticker_name": "Ethereum reach $4000?",
+    "cusip_count": 2,
+    "data_points": 62,
+    "duration_days": 61,
+    "roll_count": 1,
+    "start_date": "2025-06-01",
+    "end_date": "2025-08-01",
+    "category": ""
+  },
+  "ticker_005004": {
+    "ticker_name": "Ethereum reach $5000?",
+    "cusip_count": 2,
+    "data_points": 57,
+    "duration_days": 86,
+    "roll_count": 1,
+    "start_date": "2025-08-06",
+    "end_date": "2025-11-01",
+    "category": ""
+  },
+  "ticker_005013": {
+    "ticker_name": "Ethereum reach $8000?",
+    "cusip_count": 2,
+    "data_points": 61,
+    "duration_days": 184,
+    "roll_count": 1,
+    "start_date": "2025-05-01",
+    "end_date": "2025-11-01",
+    "category": ""
+  },
+  "ticker_005062": {
+    "ticker_name": "Exponent launch a token by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 56,
+    "duration_days": 55,
+    "roll_count": 0,
+    "start_date": "2025-12-28",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005232": {
+    "ticker_name": "Fed decrease interest rates by 25 bps after meeting?",
+    "cusip_count": 15,
+    "data_points": 550,
+    "duration_days": 575,
+    "roll_count": 12,
+    "start_date": "2024-07-26",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005233": {
+    "ticker_name": "Fed decrease interest rates by 50 bps after meeting?",
+    "cusip_count": 3,
+    "data_points": 180,
+    "duration_days": 179,
+    "roll_count": 2,
+    "start_date": "2024-08-03",
+    "end_date": "2025-01-29",
+    "category": ""
+  },
+  "ticker_005234": {
+    "ticker_name": "Fed decrease interest rates by 50+ bps after meeting?",
+    "cusip_count": 12,
+    "data_points": 459,
+    "duration_days": 576,
+    "roll_count": 9,
+    "start_date": "2024-07-26",
+    "end_date": "2026-02-22",
+    "category": ""
+  },
+  "ticker_005235": {
+    "ticker_name": "Fed decrease interest rates by 75+ bps after meeting?",
+    "cusip_count": 3,
+    "data_points": 180,
+    "duration_days": 179,
+    "roll_count": 2,
+    "start_date": "2024-08-03",
+    "end_date": "2025-01-29",
+    "category": ""
+  },
+  "ticker_005239": {
+    "ticker_name": "Fed increase interest rates by 25+ bps after meeting?",
+    "cusip_count": 14,
+    "data_points": 551,
+    "duration_days": 576,
+    "roll_count": 12,
+    "start_date": "2024-07-26",
+    "end_date": "2026-02-22",
+    "category": ""
+  },
+  "ticker_005241": {
+    "ticker_name": "Fed rate cut by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 194,
+    "duration_days": 192,
+    "roll_count": 1,
+    "start_date": "2024-03-09",
+    "end_date": "2024-09-18",
+    "category": ""
+  },
+  "ticker_005242": {
+    "ticker_name": "Fed rate cut by meeting?",
+    "cusip_count": 3,
+    "data_points": 67,
+    "duration_days": 66,
+    "roll_count": 0,
+    "start_date": "2025-12-17",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005464": {
+    "ticker_name": "Flying Tulip launch a token by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 47,
+    "duration_days": 46,
+    "roll_count": 0,
+    "start_date": "2026-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005468": {
+    "ticker_name": "Fomo launch a token by [timeframe] ?",
+    "cusip_count": 4,
+    "data_points": 84,
+    "duration_days": 83,
+    "roll_count": 0,
+    "start_date": "2025-11-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005471": {
+    "ticker_name": "Foreign intervention in Gaza by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 108,
+    "duration_days": 107,
+    "roll_count": 0,
+    "start_date": "2025-11-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005494": {
+    "ticker_name": "France, UK, or Germany strike Iran by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 32,
+    "duration_days": 31,
+    "roll_count": 0,
+    "start_date": "2026-01-21",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005643": {
+    "ticker_name": "Gavin Newsom win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 523,
+    "duration_days": 778,
+    "roll_count": 1,
+    "start_date": "2024-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005647": {
+    "ticker_name": "Gemini 3.0 be released by [timeframe]?",
+    "cusip_count": 4,
+    "data_points": 86,
+    "duration_days": 85,
+    "roll_count": 2,
+    "start_date": "2025-08-08",
+    "end_date": "2025-11-01",
+    "category": ""
+  },
+  "ticker_005698": {
+    "ticker_name": "Georgia win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 102,
+    "duration_days": 101,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-16",
+    "category": ""
+  },
+  "ticker_005705": {
+    "ticker_name": "Germany win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_005807": {
+    "ticker_name": "Gold (GC) hit (HIGH) $5,500 by end of ?",
+    "cusip_count": 2,
+    "data_points": 57,
+    "duration_days": 56,
+    "roll_count": 5,
+    "start_date": "2025-12-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005854": {
+    "ticker_name": "Golden State Warriors win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 476,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005892": {
+    "ticker_name": "Google have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 134,
+    "duration_days": 133,
+    "roll_count": 2,
+    "start_date": "2025-10-11",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_005938": {
+    "ticker_name": "Greece win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_005998": {
+    "ticker_name": "Grok 5 released by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 198,
+    "duration_days": 197,
+    "roll_count": 0,
+    "start_date": "2025-08-08",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006045": {
+    "ticker_name": "Hamas agree to disarm by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 100,
+    "duration_days": 99,
+    "roll_count": 0,
+    "start_date": "2025-11-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006192": {
+    "ticker_name": "Hezbollah strike on Israel by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 100,
+    "duration_days": 99,
+    "roll_count": 0,
+    "start_date": "2025-11-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006258": {
+    "ticker_name": "Houston Rockets win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 463,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006428": {
+    "ticker_name": "Indiana Pacers win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 449,
+    "duration_days": 515,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-22",
+    "category": ""
+  },
+  "ticker_006444": {
+    "ticker_name": "Insurrection Act invoked by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 43,
+    "duration_days": 45,
+    "roll_count": 0,
+    "start_date": "2026-01-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006461": {
+    "ticker_name": "Iran Strike on Israel by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 40,
+    "duration_days": 39,
+    "roll_count": 0,
+    "start_date": "2026-01-13",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006464": {
+    "ticker_name": "Iran close the Strait of Hormuz before ?",
+    "cusip_count": 2,
+    "data_points": 122,
+    "duration_days": 250,
+    "roll_count": 1,
+    "start_date": "2025-06-16",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006465": {
+    "ticker_name": "Iran close the Strait of Hormuz by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 32,
+    "duration_days": 31,
+    "roll_count": 0,
+    "start_date": "2026-01-21",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006477": {
+    "ticker_name": "Iranian regime fall by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 66,
+    "duration_days": 65,
+    "roll_count": 2,
+    "start_date": "2025-12-18",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006544": {
+    "ticker_name": "Israel and Indonesia normalize relations by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 102,
+    "duration_days": 101,
+    "roll_count": 0,
+    "start_date": "2025-11-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006549": {
+    "ticker_name": "Israel and Syria normalize relations by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 102,
+    "duration_days": 101,
+    "roll_count": 1,
+    "start_date": "2025-11-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006577": {
+    "ticker_name": "Israel strike 2 countries?",
+    "cusip_count": 2,
+    "data_points": 100,
+    "duration_days": 99,
+    "roll_count": 0,
+    "start_date": "2025-11-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006578": {
+    "ticker_name": "Israel strike 3 countries?",
+    "cusip_count": 2,
+    "data_points": 100,
+    "duration_days": 99,
+    "roll_count": 0,
+    "start_date": "2025-11-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006604": {
+    "ticker_name": "Israel strike on Yemen by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 46,
+    "duration_days": 45,
+    "roll_count": 0,
+    "start_date": "2026-01-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006607": {
+    "ticker_name": "Israel strikes Iran by [timeframe], ?",
+    "cusip_count": 5,
+    "data_points": 81,
+    "duration_days": 80,
+    "roll_count": 4,
+    "start_date": "2025-12-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006608": {
+    "ticker_name": "Israel win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_006611": {
+    "ticker_name": "Israel x Hamas Ceasefire Phase II by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 74,
+    "duration_days": 73,
+    "roll_count": 0,
+    "start_date": "2025-12-10",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006612": {
+    "ticker_name": "Israel x Hamas ceasefire before ?",
+    "cusip_count": 4,
+    "data_points": 204,
+    "duration_days": 203,
+    "roll_count": 4,
+    "start_date": "2025-03-20",
+    "end_date": "2025-10-09",
+    "category": ""
+  },
+  "ticker_006613": {
+    "ticker_name": "Israel x Hamas ceasefire by [timeframe]?",
+    "cusip_count": 8,
+    "data_points": 128,
+    "duration_days": 286,
+    "roll_count": 7,
+    "start_date": "2024-12-27",
+    "end_date": "2025-10-09",
+    "category": ""
+  },
+  "ticker_006619": {
+    "ticker_name": "Israel x Iran ceasefire broken by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 107,
+    "duration_days": 106,
+    "roll_count": 0,
+    "start_date": "2025-11-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006620": {
+    "ticker_name": "Israel x Syria security agreement by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 47,
+    "duration_days": 46,
+    "roll_count": 1,
+    "start_date": "2026-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_006623": {
+    "ticker_name": "Israeli parliament dissolved by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 152,
+    "duration_days": 154,
+    "roll_count": 0,
+    "start_date": "2025-09-20",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_007326": {
+    "ticker_name": "Jerome Powell out as Fed Chair by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 48,
+    "duration_days": 47,
+    "roll_count": 0,
+    "start_date": "2026-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_007327": {
+    "ticker_name": "Jerome Powell out as Fed Chair by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 47,
+    "duration_days": 46,
+    "roll_count": 1,
+    "start_date": "2025-07-17",
+    "end_date": "2025-09-01",
+    "category": ""
+  },
+  "ticker_007776": {
+    "ticker_name": "Kamala Harris win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 521,
+    "duration_days": 777,
+    "roll_count": 1,
+    "start_date": "2024-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_008021": {
+    "ticker_name": "Khamenei leave Iran by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 47,
+    "duration_days": 46,
+    "roll_count": 0,
+    "start_date": "2026-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_008022": {
+    "ticker_name": "Khamenei out as Supreme Leader of Iran by [timeframe]?",
+    "cusip_count": 6,
+    "data_points": 348,
+    "duration_days": 445,
+    "roll_count": 9,
+    "start_date": "2024-12-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_008023": {
+    "ticker_name": "Khamenei out as Supreme Leader of Iran?",
+    "cusip_count": 2,
+    "data_points": 181,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_008154": {
+    "ticker_name": "Kraken IPO by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 101,
+    "duration_days": 100,
+    "roll_count": 0,
+    "start_date": "2025-11-13",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_008345": {
+    "ticker_name": "Lamine Yamal win the Ballon d'Or?",
+    "cusip_count": 2,
+    "data_points": 201,
+    "duration_days": 199,
+    "roll_count": 0,
+    "start_date": "2025-03-07",
+    "end_date": "2025-09-23",
+    "category": ""
+  },
+  "ticker_008367": {
+    "ticker_name": "Latvia win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_008587": {
+    "ticker_name": "Lisa Cook out as Fed Governor by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 37,
+    "duration_days": 36,
+    "roll_count": 0,
+    "start_date": "2025-08-26",
+    "end_date": "2025-10-01",
+    "category": ""
+  },
+  "ticker_008593": {
+    "ticker_name": "Lithuania win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_008678": {
+    "ticker_name": "Los Angeles Angels win the World Series?",
+    "cusip_count": 2,
+    "data_points": 202,
+    "duration_days": 201,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-16",
+    "category": ""
+  },
+  "ticker_008688": {
+    "ticker_name": "Los Angeles Dodgers win the World Series?",
+    "cusip_count": 2,
+    "data_points": 70,
+    "duration_days": 69,
+    "roll_count": 0,
+    "start_date": "2025-08-25",
+    "end_date": "2025-11-02",
+    "category": ""
+  },
+  "ticker_008698": {
+    "ticker_name": "Los Angeles Lakers win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 462,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_008792": {
+    "ticker_name": "Luxembourg win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_008826": {
+    "ticker_name": "Maduro out by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 62,
+    "duration_days": 61,
+    "roll_count": 2,
+    "start_date": "2025-11-04",
+    "end_date": "2026-01-04",
+    "category": ""
+  },
+  "ticker_009206": {
+    "ticker_name": "MegaETH perform an airdrop by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 240,
+    "duration_days": 239,
+    "roll_count": 1,
+    "start_date": "2025-06-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009214": {
+    "ticker_name": "Meituan have the best AI model at the end of ?",
+    "cusip_count": 4,
+    "data_points": 81,
+    "duration_days": 79,
+    "roll_count": 10,
+    "start_date": "2025-12-03",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009224": {
+    "ticker_name": "Memphis Grizzlies win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 393,
+    "duration_days": 515,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-22",
+    "category": ""
+  },
+  "ticker_009257": {
+    "ticker_name": "MetaMask launch a token by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 109,
+    "duration_days": 108,
+    "roll_count": 0,
+    "start_date": "2025-11-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009292": {
+    "ticker_name": "Miami Heat win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 392,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009295": {
+    "ticker_name": "Miami Marlins win the World Series?",
+    "cusip_count": 2,
+    "data_points": 212,
+    "duration_days": 211,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-26",
+    "category": ""
+  },
+  "ticker_009352": {
+    "ticker_name": "Michelle Obama win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 413,
+    "duration_days": 777,
+    "roll_count": 1,
+    "start_date": "2024-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009363": {
+    "ticker_name": "MicroStrategy announce bankruptcy before ?",
+    "cusip_count": 2,
+    "data_points": 101,
+    "duration_days": 100,
+    "roll_count": 0,
+    "start_date": "2025-11-13",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009372": {
+    "ticker_name": "MicroStrategy sells any Bitcoin by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 94,
+    "duration_days": 93,
+    "roll_count": 4,
+    "start_date": "2025-11-20",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009387": {
+    "ticker_name": "Microsoft be the largest company in the world by market cap on 31?",
+    "cusip_count": 3,
+    "data_points": 418,
+    "duration_days": 417,
+    "roll_count": 1,
+    "start_date": "2024-12-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009398": {
+    "ticker_name": "Microstrategy delisted from MSCI index by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 0,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009408": {
+    "ticker_name": "Miguel D\u00edaz-Canel out as leader of Cuba by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 48,
+    "duration_days": 47,
+    "roll_count": 0,
+    "start_date": "2026-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009476": {
+    "ticker_name": "Milwaukee Bucks win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 395,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009485": {
+    "ticker_name": "Minnesota Timberwolves win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 490,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009516": {
+    "ticker_name": "Mistral have the best AI model at the end of ?",
+    "cusip_count": 5,
+    "data_points": 134,
+    "duration_days": 133,
+    "roll_count": 7,
+    "start_date": "2025-10-11",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009542": {
+    "ticker_name": "Mohamed Salah win the Ballon d'Or?",
+    "cusip_count": 2,
+    "data_points": 201,
+    "duration_days": 200,
+    "roll_count": 0,
+    "start_date": "2025-03-07",
+    "end_date": "2025-09-23",
+    "category": ""
+  },
+  "ticker_009561": {
+    "ticker_name": "Monad perform an airdrop by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 79,
+    "duration_days": 77,
+    "roll_count": 1,
+    "start_date": "2025-09-07",
+    "end_date": "2025-11-24",
+    "category": ""
+  },
+  "ticker_009569": {
+    "ticker_name": "Montenegro win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 102,
+    "duration_days": 101,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-16",
+    "category": ""
+  },
+  "ticker_009577": {
+    "ticker_name": "Moonshot have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 1,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009693": {
+    "ticker_name": "NATO x Russia military clash by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 135,
+    "duration_days": 134,
+    "roll_count": 0,
+    "start_date": "2025-10-10",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009713": {
+    "ticker_name": "NVIDIA be the largest company in the world by market cap on 30?",
+    "cusip_count": 2,
+    "data_points": 129,
+    "duration_days": 133,
+    "roll_count": 1,
+    "start_date": "2025-10-11",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009714": {
+    "ticker_name": "NVIDIA be the largest company in the world by market cap on 31?",
+    "cusip_count": 4,
+    "data_points": 181,
+    "duration_days": 179,
+    "roll_count": 2,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009890": {
+    "ticker_name": "New Orleans Pelicans win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 351,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_009917": {
+    "ticker_name": "New York Knicks win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 493,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010035": {
+    "ticker_name": "Nikki Haley win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 485,
+    "duration_days": 778,
+    "roll_count": 1,
+    "start_date": "2024-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010083": {
+    "ticker_name": "No change in Fed interest rates after meeting?",
+    "cusip_count": 12,
+    "data_points": 527,
+    "duration_days": 552,
+    "roll_count": 11,
+    "start_date": "2024-07-26",
+    "end_date": "2026-01-29",
+    "category": ""
+  },
+  "ticker_010140": {
+    "ticker_name": "Norway win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 179,
+    "duration_days": 382,
+    "roll_count": 1,
+    "start_date": "2025-02-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010156": {
+    "ticker_name": "Nothing Ever Happens",
+    "cusip_count": 2,
+    "data_points": 46,
+    "duration_days": 45,
+    "roll_count": 0,
+    "start_date": "2026-01-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010189": {
+    "ticker_name": "Nuclear weapon detonation by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 106,
+    "duration_days": 105,
+    "roll_count": 3,
+    "start_date": "2025-11-08",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010309": {
+    "ticker_name": "Oklahoma City Thunder win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 514,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010387": {
+    "ticker_name": "OpenAI IPO by [timeframe] ?",
+    "cusip_count": 2,
+    "data_points": 114,
+    "duration_days": 113,
+    "roll_count": 0,
+    "start_date": "2025-10-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010407": {
+    "ticker_name": "OpenAI have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 1,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010418": {
+    "ticker_name": "OpenAI not IPO by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 151,
+    "duration_days": 150,
+    "roll_count": 0,
+    "start_date": "2025-09-24",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010471": {
+    "ticker_name": "Orlando Magic win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 461,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_010766": {
+    "ticker_name": "Paradex launch a token by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 82,
+    "duration_days": 81,
+    "roll_count": 0,
+    "start_date": "2025-12-02",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_011040": {
+    "ticker_name": "Philadelphia 76ers win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 430,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_011160": {
+    "ticker_name": "Poland win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_011174": {
+    "ticker_name": "Portland Trail Blazers win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 372,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_011185": {
+    "ticker_name": "Portugal win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_011251": {
+    "ticker_name": "Putin meet with Zelenskyy by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 151,
+    "duration_days": 150,
+    "roll_count": 1,
+    "start_date": "2025-09-24",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_011252": {
+    "ticker_name": "Putin meet with Zelenskyy by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 63,
+    "duration_days": 61,
+    "roll_count": 1,
+    "start_date": "2025-07-31",
+    "end_date": "2025-10-01",
+    "category": ""
+  },
+  "ticker_011795": {
+    "ticker_name": "Reza Pahlavi enter Iran by [timeframe]?",
+    "cusip_count": 4,
+    "data_points": 49,
+    "duration_days": 48,
+    "roll_count": 0,
+    "start_date": "2026-01-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_011940": {
+    "ticker_name": "Ron DeSantis win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 522,
+    "duration_days": 777,
+    "roll_count": 1,
+    "start_date": "2024-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012017": {
+    "ticker_name": "Russia capture Kostyantynivka by [timeframe]?",
+    "cusip_count": 4,
+    "data_points": 100,
+    "duration_days": 99,
+    "roll_count": 0,
+    "start_date": "2025-11-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012020": {
+    "ticker_name": "Russia capture Lyman by [timeframe], ?",
+    "cusip_count": 3,
+    "data_points": 60,
+    "duration_days": 59,
+    "roll_count": 0,
+    "start_date": "2025-12-24",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012028": {
+    "ticker_name": "Russia capture all of Donetsk Oblast by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 47,
+    "duration_days": 46,
+    "roll_count": 0,
+    "start_date": "2026-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012031": {
+    "ticker_name": "Russia capture all of Kupiansk by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 70,
+    "duration_days": 69,
+    "roll_count": 0,
+    "start_date": "2025-12-14",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012034": {
+    "ticker_name": "Russia capture all of Prymorske by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 47,
+    "duration_days": 46,
+    "roll_count": 0,
+    "start_date": "2026-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012036": {
+    "ticker_name": "Russia capture all of Stepnohirsk by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 54,
+    "duration_days": 53,
+    "roll_count": 2,
+    "start_date": "2025-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012077": {
+    "ticker_name": "Russia x Ukraine ceasefire before ?",
+    "cusip_count": 3,
+    "data_points": 196,
+    "duration_days": 251,
+    "roll_count": 3,
+    "start_date": "2025-01-23",
+    "end_date": "2025-10-01",
+    "category": ""
+  },
+  "ticker_012078": {
+    "ticker_name": "Russia x Ukraine ceasefire by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 181,
+    "duration_days": 179,
+    "roll_count": 6,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012079": {
+    "ticker_name": "Russia x Ukraine ceasefire by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 117,
+    "duration_days": 116,
+    "roll_count": 2,
+    "start_date": "2025-08-07",
+    "end_date": "2025-12-01",
+    "category": ""
+  },
+  "ticker_012144": {
+    "ticker_name": "SCOTUS accepts sports event contract case by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 220,
+    "duration_days": 219,
+    "roll_count": 0,
+    "start_date": "2025-07-17",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012179": {
+    "ticker_name": "Sacramento Kings win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 381,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012233": {
+    "ticker_name": "San Antonio Spurs win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 438,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012250": {
+    "ticker_name": "San Marino win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_012285": {
+    "ticker_name": "Satoshi move any Bitcoin?",
+    "cusip_count": 2,
+    "data_points": 163,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012292": {
+    "ticker_name": "Saudi Aramco be the largest company in the world by market cap on 31?",
+    "cusip_count": 4,
+    "data_points": 178,
+    "duration_days": 179,
+    "roll_count": 6,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012295": {
+    "ticker_name": "Saudi Aramco be the second-largest company in the world by market cap on 31?",
+    "cusip_count": 2,
+    "data_points": 57,
+    "duration_days": 73,
+    "roll_count": 0,
+    "start_date": "2025-10-18",
+    "end_date": "2025-12-30",
+    "category": ""
+  },
+  "ticker_012469": {
+    "ticker_name": "Serbia win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 102,
+    "duration_days": 101,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-16",
+    "category": ""
+  },
+  "ticker_012570": {
+    "ticker_name": "Silver (SI) hit (HIGH) $120 by end of ?",
+    "cusip_count": 3,
+    "data_points": 57,
+    "duration_days": 55,
+    "roll_count": 1,
+    "start_date": "2025-12-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012573": {
+    "ticker_name": "Silver (SI) hit (HIGH) $150 by end of ?",
+    "cusip_count": 3,
+    "data_points": 57,
+    "duration_days": 56,
+    "roll_count": 1,
+    "start_date": "2025-12-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012589": {
+    "ticker_name": "Silver (SI) hit (LOW) $65 by end of ?",
+    "cusip_count": 2,
+    "data_points": 57,
+    "duration_days": 56,
+    "roll_count": 1,
+    "start_date": "2025-12-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012590": {
+    "ticker_name": "Silver (SI) hit (LOW) $70 by end of ?",
+    "cusip_count": 2,
+    "data_points": 57,
+    "duration_days": 56,
+    "roll_count": 1,
+    "start_date": "2025-12-27",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012790": {
+    "ticker_name": "SpaceX Starship Flight Test 12 launch by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 46,
+    "duration_days": 45,
+    "roll_count": 0,
+    "start_date": "2026-01-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_012802": {
+    "ticker_name": "SpaceX not IPO by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 77,
+    "duration_days": 75,
+    "roll_count": 0,
+    "start_date": "2025-12-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_013354": {
+    "ticker_name": "St. Louis Cardinals win the World Series?",
+    "cusip_count": 2,
+    "data_points": 211,
+    "duration_days": 209,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-25",
+    "category": ""
+  },
+  "ticker_013380": {
+    "ticker_name": "Starmer out by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 160,
+    "duration_days": 159,
+    "roll_count": 1,
+    "start_date": "2025-09-15",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_013627": {
+    "ticker_name": "Sweden win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_013641": {
+    "ticker_name": "Switzerland win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_013721": {
+    "ticker_name": "Taylor Swift be the top Spotify artist for ?",
+    "cusip_count": 2,
+    "data_points": 120,
+    "duration_days": 118,
+    "roll_count": 0,
+    "start_date": "2025-08-06",
+    "end_date": "2025-12-03",
+    "category": ""
+  },
+  "ticker_013737": {
+    "ticker_name": "Tempo launch a token by [timeframe] ?",
+    "cusip_count": 4,
+    "data_points": 88,
+    "duration_days": 87,
+    "roll_count": 0,
+    "start_date": "2025-11-26",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_013773": {
+    "ticker_name": "Tesla be the largest company in the world by market cap on 30?",
+    "cusip_count": 2,
+    "data_points": 129,
+    "duration_days": 133,
+    "roll_count": 2,
+    "start_date": "2025-10-11",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_013774": {
+    "ticker_name": "Tesla be the largest company in the world by market cap on 31?",
+    "cusip_count": 3,
+    "data_points": 181,
+    "duration_days": 179,
+    "roll_count": 1,
+    "start_date": "2025-08-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014014": {
+    "ticker_name": "Tim Walz charged by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 76,
+    "duration_days": 74,
+    "roll_count": 0,
+    "start_date": "2025-12-08",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014018": {
+    "ticker_name": "Tim Walz resign by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 55,
+    "duration_days": 53,
+    "roll_count": 0,
+    "start_date": "2025-12-29",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014136": {
+    "ticker_name": "Toronto Blue Jays win the World Series?",
+    "cusip_count": 2,
+    "data_points": 71,
+    "duration_days": 70,
+    "roll_count": 0,
+    "start_date": "2025-08-25",
+    "end_date": "2025-11-03",
+    "category": ""
+  },
+  "ticker_014148": {
+    "ticker_name": "Toronto Raptors win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 368,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014377": {
+    "ticker_name": "Trump acquire Greenland before ?",
+    "cusip_count": 2,
+    "data_points": 242,
+    "duration_days": 417,
+    "roll_count": 1,
+    "start_date": "2024-12-31",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014406": {
+    "ticker_name": "Trump create a tariff dividend by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 102,
+    "duration_days": 101,
+    "roll_count": 0,
+    "start_date": "2025-11-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014479": {
+    "ticker_name": "Trump meet with Xi Jinping?",
+    "cusip_count": 3,
+    "data_points": 253,
+    "duration_days": 252,
+    "roll_count": 0,
+    "start_date": "2025-02-20",
+    "end_date": "2025-10-30",
+    "category": ""
+  },
+  "ticker_014530": {
+    "ticker_name": "Trump release the Epstein files by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 36,
+    "duration_days": 35,
+    "roll_count": 1,
+    "start_date": "2025-11-19",
+    "end_date": "2025-12-24",
+    "category": ""
+  },
+  "ticker_014687": {
+    "ticker_name": "Trump sell 0 Gold Cards?",
+    "cusip_count": 2,
+    "data_points": 309,
+    "duration_days": 308,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2026-01-01",
+    "category": ""
+  },
+  "ticker_014705": {
+    "ticker_name": "Trump talk to Emmanuel Macron?",
+    "cusip_count": 2,
+    "data_points": 50,
+    "duration_days": 49,
+    "roll_count": 0,
+    "start_date": "2025-12-13",
+    "end_date": "2026-01-31",
+    "category": ""
+  },
+  "ticker_014721": {
+    "ticker_name": "Trump talk to Vladimir Putin?",
+    "cusip_count": 2,
+    "data_points": 44,
+    "duration_days": 51,
+    "roll_count": 0,
+    "start_date": "2025-12-15",
+    "end_date": "2026-02-04",
+    "category": ""
+  },
+  "ticker_014725": {
+    "ticker_name": "Trump visit China by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 128,
+    "duration_days": 154,
+    "roll_count": 1,
+    "start_date": "2025-09-20",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014861": {
+    "ticker_name": "U.S. anti-cartel ground operation in Mexico by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 42,
+    "duration_days": 41,
+    "roll_count": 1,
+    "start_date": "2026-01-10",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014879": {
+    "ticker_name": "U.S. invade Venezuela by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 168,
+    "duration_days": 167,
+    "roll_count": 1,
+    "start_date": "2025-09-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014892": {
+    "ticker_name": "U.S. x Iran Military Engagement by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 46,
+    "duration_days": 45,
+    "roll_count": 0,
+    "start_date": "2026-01-07",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_014969": {
+    "ticker_name": "US confirm that aliens exist?",
+    "cusip_count": 2,
+    "data_points": 312,
+    "duration_days": 548,
+    "roll_count": 1,
+    "start_date": "2024-07-02",
+    "end_date": "2026-01-01",
+    "category": ""
+  },
+  "ticker_014977": {
+    "ticker_name": "US forces enter Iran by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 41,
+    "duration_days": 40,
+    "roll_count": 0,
+    "start_date": "2026-01-12",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015022": {
+    "ticker_name": "US next strike Iran on 31, (ET)?",
+    "cusip_count": 2,
+    "data_points": 30,
+    "duration_days": 39,
+    "roll_count": 1,
+    "start_date": "2026-01-13",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015029": {
+    "ticker_name": "US not strike Iran by [timeframe], ?",
+    "cusip_count": 4,
+    "data_points": 40,
+    "duration_days": 39,
+    "roll_count": 5,
+    "start_date": "2026-01-13",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015032": {
+    "ticker_name": "US officially declare war on Iran by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 35,
+    "duration_days": 39,
+    "roll_count": 0,
+    "start_date": "2026-01-13",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015034": {
+    "ticker_name": "US or Israel strike Iran by [timeframe], ?",
+    "cusip_count": 6,
+    "data_points": 39,
+    "duration_days": 42,
+    "roll_count": 1,
+    "start_date": "2026-01-09",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015057": {
+    "ticker_name": "US strike on Colombia by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 48,
+    "duration_days": 47,
+    "roll_count": 1,
+    "start_date": "2026-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015058": {
+    "ticker_name": "US strike on Cuba by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 48,
+    "duration_days": 47,
+    "roll_count": 0,
+    "start_date": "2026-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015059": {
+    "ticker_name": "US strike on Mexico by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 48,
+    "duration_days": 47,
+    "roll_count": 0,
+    "start_date": "2026-01-05",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015061": {
+    "ticker_name": "US strikes Iran by [timeframe], ?",
+    "cusip_count": 54,
+    "data_points": 61,
+    "duration_days": 60,
+    "roll_count": 19,
+    "start_date": "2025-12-23",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015077": {
+    "ticker_name": "US x Venezuela military engagement by [timeframe]?",
+    "cusip_count": 4,
+    "data_points": 134,
+    "duration_days": 133,
+    "roll_count": 2,
+    "start_date": "2025-08-25",
+    "end_date": "2026-01-05",
+    "category": ""
+  },
+  "ticker_015079": {
+    "ticker_name": "US-Iran nuclear deal before ?",
+    "cusip_count": 2,
+    "data_points": 184,
+    "duration_days": 312,
+    "roll_count": 1,
+    "start_date": "2025-04-15",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015080": {
+    "ticker_name": "US-Iran nuclear deal by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 66,
+    "duration_days": 65,
+    "roll_count": 0,
+    "start_date": "2025-12-18",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015122": {
+    "ticker_name": "Ukraine election called by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 151,
+    "duration_days": 150,
+    "roll_count": 2,
+    "start_date": "2025-09-24",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015123": {
+    "ticker_name": "Ukraine election held by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 151,
+    "duration_days": 150,
+    "roll_count": 1,
+    "start_date": "2025-09-24",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015129": {
+    "ticker_name": "Ukraine officially agrees to a US backed ceasefire framework by [timeframe]?",
+    "cusip_count": 3,
+    "data_points": 78,
+    "duration_days": 77,
+    "roll_count": 0,
+    "start_date": "2025-12-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015134": {
+    "ticker_name": "Ukraine recognizes Russian sovereignty over its territory by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 151,
+    "duration_days": 150,
+    "roll_count": 0,
+    "start_date": "2025-09-24",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015137": {
+    "ticker_name": "Ukraine signs peace deal with Russia by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 108,
+    "duration_days": 107,
+    "roll_count": 0,
+    "start_date": "2025-11-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015158": {
+    "ticker_name": "United Kingdom win Eurovision ?",
+    "cusip_count": 2,
+    "data_points": 104,
+    "duration_days": 103,
+    "roll_count": 0,
+    "start_date": "2025-02-04",
+    "end_date": "2025-05-18",
+    "category": ""
+  },
+  "ticker_015186": {
+    "ticker_name": "Utah Jazz win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 343,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015396": {
+    "ticker_name": "Vivek Ramaswamy win the US Presidential Election?",
+    "cusip_count": 2,
+    "data_points": 484,
+    "duration_days": 777,
+    "roll_count": 1,
+    "start_date": "2024-01-06",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015485": {
+    "ticker_name": "Washington Nationals win the World Series?",
+    "cusip_count": 2,
+    "data_points": 200,
+    "duration_days": 199,
+    "roll_count": 0,
+    "start_date": "2025-02-27",
+    "end_date": "2025-09-14",
+    "category": ""
+  },
+  "ticker_015494": {
+    "ticker_name": "Washington Wizards win the NBA Finals?",
+    "cusip_count": 2,
+    "data_points": 357,
+    "duration_days": 514,
+    "roll_count": 1,
+    "start_date": "2024-09-25",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015525": {
+    "ticker_name": "Weeknd be the top Spotify artist for ?",
+    "cusip_count": 2,
+    "data_points": 120,
+    "duration_days": 119,
+    "roll_count": 0,
+    "start_date": "2025-08-06",
+    "end_date": "2025-12-03",
+    "category": ""
+  },
+  "ticker_015579": {
+    "ticker_name": "Wicked: For Good be the top grossing movie of ?",
+    "cusip_count": 2,
+    "data_points": 365,
+    "duration_days": 364,
+    "roll_count": 0,
+    "start_date": "2025-01-03",
+    "end_date": "2026-01-02",
+    "category": ""
+  },
+  "ticker_015741": {
+    "ticker_name": "Xi Jinping out before ?",
+    "cusip_count": 2,
+    "data_points": 233,
+    "duration_days": 232,
+    "roll_count": 1,
+    "start_date": "2025-07-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015776": {
+    "ticker_name": "Yoon out as president of South Korea before ?",
+    "cusip_count": 2,
+    "data_points": 125,
+    "duration_days": 124,
+    "roll_count": 1,
+    "start_date": "2024-12-05",
+    "end_date": "2025-04-08",
+    "category": ""
+  },
+  "ticker_015777": {
+    "ticker_name": "Yoon out as president of South Korea?",
+    "cusip_count": 2,
+    "data_points": 118,
+    "duration_days": 121,
+    "roll_count": 1,
+    "start_date": "2024-12-04",
+    "end_date": "2025-04-04",
+    "category": ""
+  },
+  "ticker_015796": {
+    "ticker_name": "Z.ai have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 1,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015866": {
+    "ticker_name": "Zelenskyy out as Ukraine president by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 82,
+    "duration_days": 81,
+    "roll_count": 0,
+    "start_date": "2025-12-02",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_015869": {
+    "ticker_name": "Zelenskyy wear a suit before ?",
+    "cusip_count": 2,
+    "data_points": 82,
+    "duration_days": 81,
+    "roll_count": 1,
+    "start_date": "2025-04-19",
+    "end_date": "2025-07-09",
+    "category": ""
+  },
+  "ticker_015984": {
+    "ticker_name": "a new Cabinet of the Netherlands be sworn in by [timeframe], ?",
+    "cusip_count": 2,
+    "data_points": 124,
+    "duration_days": 123,
+    "roll_count": 0,
+    "start_date": "2025-10-21",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_016073": {
+    "ticker_name": "anyone be charged over Daycare fraud in Minnesota by [timeframe]?",
+    "cusip_count": 2,
+    "data_points": 54,
+    "duration_days": 53,
+    "roll_count": 1,
+    "start_date": "2025-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_016088": {
+    "ticker_name": "be the hottest year on record?",
+    "cusip_count": 2,
+    "data_points": 417,
+    "duration_days": 416,
+    "roll_count": 1,
+    "start_date": "2025-01-01",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_016267": {
+    "ticker_name": "hottest on record?",
+    "cusip_count": 3,
+    "data_points": 94,
+    "duration_days": 216,
+    "roll_count": 2,
+    "start_date": "2024-07-10",
+    "end_date": "2025-02-11",
+    "category": ""
+  },
+  "ticker_016331": {
+    "ticker_name": "no Fed rate cuts happen?",
+    "cusip_count": 2,
+    "data_points": 407,
+    "duration_days": 418,
+    "roll_count": 1,
+    "start_date": "2024-12-30",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_016762": {
+    "ticker_name": "there be no change in Fed interest rates after meeting?",
+    "cusip_count": 3,
+    "data_points": 110,
+    "duration_days": 112,
+    "roll_count": 6,
+    "start_date": "2025-11-01",
+    "end_date": "2026-02-21",
+    "category": ""
+  },
+  "ticker_016834": {
+    "ticker_name": "xAI have the best AI model at the end of ?",
+    "cusip_count": 3,
+    "data_points": 80,
+    "duration_days": 79,
+    "roll_count": 7,
+    "start_date": "2025-12-04",
+    "end_date": "2026-02-21",
+    "category": ""
+  }
+}
