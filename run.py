@@ -6,7 +6,7 @@ Takes ~20K raw prediction market contracts, maps them to recurring Tickers,
 and builds continuous time series by rolling contracts across expirations.
 
 Usage: python run.py
-Output: output/charts/*.png + output/results.xlsx
+Output: output/charts/*.png (one per Ticker) + output/results.xlsx (one sheet per Ticker)
 """
 
 import pandas as pd
@@ -433,292 +433,181 @@ def build_ticker_timeseries(ticker_chains, markets_df, min_days=30):
 
 
 # =============================================================================
-# STEP 4: Generate charts
+# STEP 4: Generate individual ticker charts
 # =============================================================================
 
-def chart_01_categories(category_counts):
-    """Market distribution by category."""
-    fig, ax = plt.subplots(figsize=(14, 7))
-    top = category_counts.head(15)
-    colors = ['#e74c3c' if c in ['sports', 'entertainment'] else '#3498db' for c in top.index]
-    bars = ax.barh(range(len(top)), top.values, color=colors)
-    ax.set_yticks(range(len(top)))
-    ax.set_yticklabels(top.index)
-    ax.set_xlabel('Number of Markets')
-    ax.set_title('Market Distribution by Category (red = filtered out)')
-    ax.invert_yaxis()
-    for i, v in enumerate(top.values):
-        ax.text(v + 50, i, f'{v:,}', va='center', fontsize=10)
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / '01_category_distribution.png', dpi=150)
-    plt.close()
-    print("  ✓ 01_category_distribution.png")
+def sanitize_filename(name):
+    """Sanitize ticker name for use as filename."""
+    # Remove or replace characters that aren't safe for filenames
+    name = re.sub(r'[<>:"/\\|?*]', '_', name)  # Windows-unsafe chars
+    name = re.sub(r'[^\w\s\-_\.]', '_', name)  # Keep only word chars, spaces, hyphens, underscores, dots
+    name = re.sub(r'\s+', '_', name)  # Replace spaces with underscores
+    name = re.sub(r'_{2,}', '_', name)  # Replace multiple underscores with single
+    name = name.strip('_')  # Remove leading/trailing underscores
+    return name[:100]  # Limit length to 100 chars
 
 
-def chart_02_ticker_distribution(ticker_chains):
-    """CUSIPs per Ticker distribution."""
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-    
-    sizes = [v['market_count'] for v in ticker_chains.values()]
-    
-    # Histogram
-    ax1.hist([s for s in sizes if s <= 20], bins=range(1, 22), color='#3498db', edgecolor='white')
-    ax1.set_xlabel('CUSIPs per Ticker')
-    ax1.set_ylabel('Number of Tickers')
-    ax1.set_title('Distribution of CUSIPs per Ticker')
-    
-    # Top Tickers
-    top = sorted(ticker_chains.values(), key=lambda x: -x['market_count'])[:15]
-    names = [t['ticker_name'][:40] for t in top]
-    counts = [t['market_count'] for t in top]
-    ax2.barh(range(len(names)), counts, color='#2ecc71')
-    ax2.set_yticks(range(len(names)))
-    ax2.set_yticklabels(names, fontsize=9)
-    ax2.set_xlabel('Number of CUSIPs')
-    ax2.set_title('Top 15 Tickers by CUSIP Count')
-    ax2.invert_yaxis()
-    
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / '02_ticker_cusip_distribution.png', dpi=150)
-    plt.close()
-    print("  ✓ 02_ticker_cusip_distribution.png")
-
-
-def chart_03_timeseries_samples(raw_df, stats, category_filter, filename, title):
-    """Plot sample Ticker time series for a category."""
-    if raw_df.empty:
-        print(f"  ✗ {filename} (no data)")
-        return
-    
-    # Get tickers for this category with most data
-    cat_tickers = []
-    for tid, s in stats.items():
-        # Try to match category from ticker mapping
-        ticker_data = raw_df[raw_df['ticker_id'] == tid]
-        if ticker_data.empty:
-            continue
-        name = s['ticker_name'].lower()
-        match = False
-        for keyword in category_filter:
-            if keyword in name:
-                match = True
-                break
-        if match and s['data_points'] >= 60:
-            cat_tickers.append((tid, s))
-    
-    cat_tickers.sort(key=lambda x: -x[1]['data_points'])
-    cat_tickers = cat_tickers[:6]
-    
-    if not cat_tickers:
-        print(f"  ✗ {filename} (no matching tickers)")
-        return
-    
-    n = len(cat_tickers)
-    fig, axes = plt.subplots(min(n, 3), max(1, (n + 2) // 3), figsize=(16, 4 * min(n, 3)), squeeze=False)
-    axes_flat = axes.flatten()
-    
-    for i, (tid, s) in enumerate(cat_tickers):
-        if i >= len(axes_flat):
-            break
-        ax = axes_flat[i]
-        data = raw_df[raw_df['ticker_id'] == tid].sort_values('date')
-        ax.plot(data['date'], data['close'], linewidth=1.5, color='#2c3e50')
-        
-        # Mark roll points
-        rolls = data[data['is_roll']]
-        if len(rolls) > 0:
-            ax.scatter(rolls['date'], rolls['close'], color='#e74c3c', s=30, zorder=5, label='Roll')
-        
-        ax.set_title(s['ticker_name'][:50], fontsize=10)
-        ax.set_ylabel('Probability')
-        ax.set_ylim(-0.05, 1.05)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %y'))
-        if len(rolls) > 0:
-            ax.legend(fontsize=8)
-    
-    # Hide unused axes
-    for j in range(i + 1, len(axes_flat)):
-        axes_flat[j].set_visible(False)
-    
-    fig.suptitle(title, fontsize=14, fontweight='bold')
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / filename, dpi=150)
-    plt.close()
-    print(f"  ✓ {filename}")
-
-
-def chart_07_roll_analysis(raw_df, stats):
-    """Roll points analysis."""
-    if raw_df.empty:
-        print("  ✗ 07_roll_points_analysis.png (no data)")
-        return
-    
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-    
-    # Roll count distribution
-    roll_counts = [s['roll_count'] for s in stats.values()]
-    ax1.hist(roll_counts, bins=range(0, max(roll_counts) + 2), color='#9b59b6', edgecolor='white')
-    ax1.set_xlabel('Number of Rolls')
-    ax1.set_ylabel('Number of Tickers')
-    ax1.set_title('Roll Count Distribution')
-    
-    # Duration vs rolls
-    durations = [s['duration_days'] for s in stats.values()]
-    ax2.scatter(durations, roll_counts, alpha=0.5, s=20, color='#e67e22')
-    ax2.set_xlabel('Duration (days)')
-    ax2.set_ylabel('Number of Rolls')
-    ax2.set_title('Duration vs Roll Count')
-    
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / '07_roll_points_analysis.png', dpi=150)
-    plt.close()
-    print("  ✓ 07_roll_points_analysis.png")
-
-
-def chart_08_coverage(raw_df):
-    """Data coverage timeline."""
-    if raw_df.empty:
-        print("  ✗ 08_coverage_timeline.png (no data)")
-        return
-    
-    fig, ax = plt.subplots(figsize=(14, 6))
-    
-    daily = raw_df.groupby(raw_df['date'].dt.to_period('M')).agg(
-        tickers=('ticker_id', 'nunique'),
-        points=('close', 'count'),
-    ).reset_index()
-    daily['date'] = daily['date'].dt.to_timestamp()
-    
-    ax.bar(daily['date'], daily['tickers'], width=25, color='#3498db', alpha=0.7)
-    ax.set_xlabel('Date')
-    ax.set_ylabel('Active Tickers')
-    ax.set_title('Active Ticker Coverage Over Time')
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))
-    
-    plt.tight_layout()
-    plt.savefig(CHARTS_DIR / '08_coverage_timeline.png', dpi=150)
-    plt.close()
-    print("  ✓ 08_coverage_timeline.png")
-
-
-def generate_all_charts(category_counts, ticker_chains, raw_df, stats):
-    """Generate all charts."""
+def generate_ticker_charts(raw_df, stats):
+    """Generate one PNG chart per Ticker showing time series with roll points."""
     print("\n" + "=" * 60)
-    print("STEP 4: Generating charts")
+    print("STEP 4: Generating Ticker charts")
     print("=" * 60)
     
-    chart_01_categories(category_counts)
-    chart_02_ticker_distribution(ticker_chains)
-    chart_03_timeseries_samples(raw_df, stats,
-        ['fed', 'interest rate', 'monetary'],
-        '03_sample_timeseries_fed.png', 'Fed Rate Decision Tickers')
-    chart_03_timeseries_samples(raw_df, stats,
-        ['bitcoin', 'ethereum', 'crypto', 'token'],
-        '04_sample_timeseries_crypto.png', 'Crypto Tickers')
-    chart_03_timeseries_samples(raw_df, stats,
-        ['president', 'election', 'nominee', 'nomination'],
-        '05_sample_timeseries_politics.png', 'Election Tickers')
-    chart_03_timeseries_samples(raw_df, stats,
-        ['iran', 'ukraine', 'china', 'taiwan', 'ceasefire', 'strike'],
-        '06_sample_timeseries_geopolitics.png', 'Geopolitical Tickers')
-    chart_07_roll_analysis(raw_df, stats)
-    chart_08_coverage(raw_df)
+    if raw_df.empty:
+        print("  No data for charts")
+        return
+    
+    unique_tickers = raw_df['ticker_id'].unique()
+    print(f"  Generating {len(unique_tickers)} charts...")
+    
+    generated = 0
+    skipped = 0
+    
+    for i, ticker_id in enumerate(unique_tickers):
+        if (i + 1) % 50 == 0:
+            print(f"  ... {i+1}/{len(unique_tickers)}")
+        
+        # Get data for this ticker
+        ticker_data = raw_df[raw_df['ticker_id'] == ticker_id].sort_values('date')
+        if ticker_data.empty:
+            skipped += 1
+            continue
+            
+        ticker_name = ticker_data['ticker_name'].iloc[0]
+        ticker_stats = stats.get(ticker_id, {})
+        
+        # Create chart
+        fig, ax = plt.subplots(figsize=(12, 7))
+        
+        # Plot main time series
+        ax.plot(ticker_data['date'], ticker_data['close'], 
+                linewidth=1.5, color='#2c3e50', label='Price')
+        
+        # Mark roll points
+        rolls = ticker_data[ticker_data['is_roll']]
+        if len(rolls) > 0:
+            ax.scatter(rolls['date'], rolls['close'], 
+                      color='#e74c3c', s=50, zorder=5, label='Roll Points')
+        
+        # Formatting
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Probability')
+        ax.set_ylim(-0.05, 1.05)
+        ax.set_title(ticker_name, fontsize=14, fontweight='bold')
+        
+        # Subtitle with stats
+        duration = ticker_stats.get('duration_days', 0)
+        data_points = ticker_stats.get('data_points', 0)
+        roll_count = ticker_stats.get('roll_count', 0)
+        subtitle = f"Duration: {duration} days | Data points: {data_points:,} | Rolls: {roll_count}"
+        ax.text(0.5, 0.95, subtitle, transform=ax.transAxes, 
+                ha='center', va='top', fontsize=10, style='italic')
+        
+        # Date formatting
+        if len(ticker_data) > 365:
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
+            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+        else:
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
+        
+        # Legend if there are roll points
+        if len(rolls) > 0:
+            ax.legend()
+        
+        # Grid
+        ax.grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        
+        # Save with sanitized filename
+        filename = sanitize_filename(ticker_name) + '.png'
+        filepath = CHARTS_DIR / filename
+        plt.savefig(filepath, dpi=150, bbox_inches='tight')
+        plt.close()
+        
+        generated += 1
+    
+    print(f"  Generated: {generated} charts")
+    print(f"  Skipped: {skipped} tickers")
 
 
 # =============================================================================
-# STEP 5: Write Excel output
+# STEP 5: Write Excel with one sheet per ticker
 # =============================================================================
 
-def write_excel(markets, mapping_df, ticker_chains, stats, category_counts):
-    """Write results to Excel."""
+def write_ticker_excel(raw_df, stats, markets, category_counts):
+    """Write results.xlsx with one sheet per Ticker plus Summary."""
     print("\n" + "=" * 60)
     print("STEP 5: Writing results.xlsx")
     print("=" * 60)
     
     xlsx_path = OUTPUT_DIR / 'results.xlsx'
     
+    if raw_df.empty:
+        print("  No time series data for Excel")
+        return
+    
     with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer:
-        # Summary sheet
-        summary_data = {
-            'Metric': [
-                'Total Markets Ingested',
-                'Sports Markets (filtered)',
-                'Entertainment Markets (filtered)',
-                'Markets After Filtering',
-                'Unique Tickers',
-                'Rollable Tickers (2+ CUSIPs)',
-                'Tickers with Time Series',
-                'Total Data Points',
-                'Total Roll Points',
-                'Date Range Start',
-                'Date Range End',
-            ],
-            'Value': [
-                len(markets),
-                int(category_counts.get('sports', 0)),
-                int(category_counts.get('entertainment', 0)),
-                len(markets[~markets['category'].isin(['sports', 'entertainment'])]),
-                len(ticker_chains),
-                sum(1 for v in ticker_chains.values() if v['market_count'] >= 2),
-                len(stats),
-                sum(s['data_points'] for s in stats.values()),
-                sum(s['roll_count'] for s in stats.values()),
-                min((s['start_date'] for s in stats.values()), default='N/A'),
-                max((s['end_date'] for s in stats.values()), default='N/A'),
-            ]
-        }
-        pd.DataFrame(summary_data).to_excel(writer, sheet_name='Summary', index=False)
-        
-        # Ticker Mapping sheet
-        ticker_summary = []
-        for tid, chain in ticker_chains.items():
-            ticker_summary.append({
-                'Ticker ID': tid,
-                'Ticker Name': chain['ticker_name'],
-                'CUSIP Count': chain['market_count'],
-                'Rollable': 'Yes' if chain['market_count'] >= 2 else 'No',
+        # Summary sheet first
+        summary_rows = []
+        for ticker_id, s in stats.items():
+            summary_rows.append({
+                'Ticker ID': ticker_id,
+                'Ticker Name': s['ticker_name'],
+                'Duration (days)': s['duration_days'], 
+                'Data Points': s['data_points'],
+                'Rolls': s['roll_count'],
+                'Start Date': s['start_date'],
+                'End Date': s['end_date'],
             })
-        pd.DataFrame(ticker_summary).sort_values('CUSIP Count', ascending=False).to_excel(
-            writer, sheet_name='Ticker Mapping', index=False)
         
-        # Ticker Chains sheet (rollable only)
-        chain_rows = []
-        for tid, chain in ticker_chains.items():
-            if chain['market_count'] < 2:
+        summary_df = pd.DataFrame(summary_rows).sort_values('Data Points', ascending=False)
+        summary_df.to_excel(writer, sheet_name='Summary', index=False)
+        print(f"  ✓ Summary sheet with {len(summary_df)} tickers")
+        
+        # One sheet per ticker
+        unique_tickers = raw_df['ticker_id'].unique()
+        print(f"  Creating {len(unique_tickers)} ticker sheets...")
+        
+        created = 0
+        skipped = 0
+        
+        for i, ticker_id in enumerate(unique_tickers):
+            if (i + 1) % 50 == 0:
+                print(f"  ... {i+1}/{len(unique_tickers)}")
+            
+            # Get data for this ticker
+            ticker_data = raw_df[raw_df['ticker_id'] == ticker_id].sort_values('date')
+            if ticker_data.empty:
+                skipped += 1
                 continue
-            for i, m in enumerate(chain['markets']):
-                chain_rows.append({
-                    'Ticker ID': tid,
-                    'Ticker Name': chain['ticker_name'],
-                    'CUSIP #': i + 1,
-                    'Market ID': m['market_id'],
-                    'Title': m['title'],
-                    'End Date': m['end_date'],
-                })
-        pd.DataFrame(chain_rows).to_excel(writer, sheet_name='Ticker Chains', index=False)
+            
+            ticker_name = ticker_data['ticker_name'].iloc[0]
+            
+            # Prepare sheet data
+            sheet_data = ticker_data[['date', 'close', 'volume', 'cusip', 'is_roll']].copy()
+            sheet_data.columns = ['Date', 'Price', 'Volume', 'Active CUSIP', 'Is Roll Point']
+            
+            # Sheet name (Excel limits to 31 chars)
+            sheet_name = sanitize_filename(ticker_name)[:31]
+            
+            # Handle duplicate sheet names
+            base_sheet_name = sheet_name
+            counter = 1
+            while sheet_name in [ws.title for ws in writer.book.worksheets]:
+                sheet_name = f"{base_sheet_name[:28]}_{counter}"
+                counter += 1
+            
+            try:
+                sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
+                created += 1
+            except Exception as e:
+                print(f"  Warning: Could not create sheet for {ticker_name}: {e}")
+                skipped += 1
         
-        # Time Series Stats sheet
-        if stats:
-            ts_rows = []
-            for tid, s in stats.items():
-                ts_rows.append({
-                    'Ticker ID': tid,
-                    'Ticker Name': s['ticker_name'],
-                    'CUSIPs': s['cusip_count'],
-                    'Data Points': s['data_points'],
-                    'Duration (days)': s['duration_days'],
-                    'Rolls': s['roll_count'],
-                    'Start Date': s['start_date'],
-                    'End Date': s['end_date'],
-                })
-            pd.DataFrame(ts_rows).sort_values('Data Points', ascending=False).to_excel(
-                writer, sheet_name='Time Series Stats', index=False)
-        
-        # Market Classifications sheet
-        class_df = markets[['market_id', 'title', 'category', 'event_slug', 'platform']].copy()
-        class_df = class_df.sort_values('category')
-        # Limit to 50K rows for Excel
-        class_df.head(50000).to_excel(writer, sheet_name='Market Classifications', index=False)
+        print(f"  ✓ Created {created} ticker sheets")
+        if skipped > 0:
+            print(f"  ✗ Skipped {skipped} sheets")
     
     print(f"  ✓ {xlsx_path}")
 
@@ -729,46 +618,42 @@ def write_excel(markets, mapping_df, ticker_chains, stats, category_counts):
 
 def main():
     print("=" * 60)
-    print("  PREDICTION MARKET TICKER GENERATION")
+    print("  PREDICTION MARKET TICKER TIME SERIES")
     print("  " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 60)
     
-    # Step 1
+    # Step 1: Load markets
     markets, filtered, category_counts = load_markets()
     
-    # Step 2
+    # Step 2: Build ticker mapping
     mapping_df, ticker_chains = build_ticker_mapping(markets)
     
-    # Step 3
+    # Step 3: Build time series
     raw_df, adj_df, stats = build_ticker_timeseries(ticker_chains, markets)
     
-    # Step 4
-    generate_all_charts(category_counts, ticker_chains, raw_df, stats)
+    # Step 4: Generate individual ticker charts
+    generate_ticker_charts(raw_df, stats)
     
-    # Step 5
-    write_excel(markets, mapping_df, ticker_chains, stats, category_counts)
+    # Step 5: Write Excel with one sheet per ticker
+    write_ticker_excel(raw_df, stats, markets, category_counts)
     
-    # Save processed data
     print("\n" + "=" * 60)
-    print("STEP 6: Saving processed data")
+    print("  SUMMARY")
     print("=" * 60)
     
-    mapping_df.to_parquet(OUTPUT_DIR / 'ticker_mapping.parquet', index=False)
-    print(f"  ✓ ticker_mapping.parquet")
-    
-    with open(OUTPUT_DIR / 'ticker_chains.json', 'w') as f:
-        json.dump(ticker_chains, f, indent=2, default=str)
-    print(f"  ✓ ticker_chains.json")
-    
-    if not raw_df.empty:
-        raw_df.to_parquet(OUTPUT_DIR / 'ticker_timeseries_raw.parquet', index=False)
-        adj_df.to_parquet(OUTPUT_DIR / 'ticker_timeseries_adjusted.parquet', index=False)
-        print(f"  ✓ ticker_timeseries_raw.parquet")
-        print(f"  ✓ ticker_timeseries_adjusted.parquet")
-    
-    with open(OUTPUT_DIR / 'ticker_timeseries_stats.json', 'w') as f:
-        json.dump(stats, f, indent=2)
-    print(f"  ✓ ticker_timeseries_stats.json")
+    if stats:
+        print(f"  Total Tickers with time series: {len(stats)}")
+        print(f"  Charts generated: {len([f for f in CHARTS_DIR.glob('*.png')])}")
+        print(f"  Excel sheets: {len(stats) + 1} (1 summary + {len(stats)} tickers)")
+        print(f"  Total data points: {sum(s['data_points'] for s in stats.values()):,}")
+        print(f"  Total roll points: {sum(s['roll_count'] for s in stats.values())}")
+        
+        # Date range
+        start_dates = [s['start_date'] for s in stats.values()]
+        end_dates = [s['end_date'] for s in stats.values()]
+        print(f"  Data range: {min(start_dates)} to {max(end_dates)}")
+    else:
+        print("  No time series data generated")
     
     print("\n" + "=" * 60)
     print("  DONE")
