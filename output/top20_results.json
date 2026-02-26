@@ -2,6 +2,21 @@
   "top_20_tickers": [
     {
       "rank": 1,
+      "ticker_id": "ticker_002926",
+      "score": 378898.0,
+      "ticker_name": "China invade Taiwan?",
+      "category": "china_geopolitics",
+      "data_points": 741,
+      "span_days": 767,
+      "num_gaps": 0,
+      "max_jump": 0.1235,
+      "num_contracts": 4,
+      "start_date": "2024-01-16",
+      "end_date": "2026-02-21",
+      "is_geo": true
+    },
+    {
+      "rank": 2,
       "ticker_id": "ticker_011249",
       "score": 139555.4,
       "ticker_name": "Putin out as President of Russia?",
@@ -12,21 +27,6 @@
       "max_jump": 0.0565,
       "num_contracts": 2,
       "start_date": "2024-12-30",
-      "end_date": "2026-02-21",
-      "is_geo": true
-    },
-    {
-      "rank": 2,
-      "ticker_id": "ticker_002926",
-      "score": 136014.7,
-      "ticker_name": "China invade Taiwan?",
-      "category": "china_geopolitics",
-      "data_points": 532,
-      "span_days": 767,
-      "num_gaps": 1,
-      "max_jump": 0.8,
-      "num_contracts": 5,
-      "start_date": "2024-01-16",
       "end_date": "2026-02-21",
       "is_geo": true
     },
@@ -303,5 +303,5 @@
   ],
   "total_scored_tickers": 981,
   "geo_in_top20": 10,
-  "generated_at": "2026-02-25T22:14:37.799615"
+  "generated_at": "2026-02-25T22:25:15.053670"
 }
