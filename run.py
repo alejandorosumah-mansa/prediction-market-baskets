@@ -64,6 +64,9 @@ EXCLUDE_CATEGORIES = {
     'sports', 'entertainment',
 }
 
+# Blacklist meme/joke contracts by keyword in ticker name
+EXCLUDE_NAME_KEYWORDS = {'gta', 'gta vi', 'before gta'}
+
 TRUE_GAP_THRESHOLD_DAYS = 30  # Only break lines for gaps > 30 days
 DISPLAY_GAP_THRESHOLD_DAYS = 7  # Insert NaN to break line visually
 MIN_DATA_POINTS = 30
@@ -328,6 +331,11 @@ def main():
             excluded += 1
             continue
         if cat not in KEEP_CATEGORIES and cat != 'unknown':
+            excluded += 1
+            continue
+        # Blacklist meme/joke tickers
+        tname = (ticker_names.get(tid, '') or '').lower()
+        if any(kw in tname for kw in EXCLUDE_NAME_KEYWORDS):
             excluded += 1
             continue
         kept_tickers.append(tid)
