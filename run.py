@@ -1,26 +1,25 @@
 #!/usr/bin/env python3
 """
-Prediction Market Ticker Generation Pipeline
+Prediction Market Ticker Index Pipeline
 
-Takes ~20K raw prediction market contracts, maps them to recurring Tickers,
-and builds continuous time series by rolling contracts across expirations.
+Uses pre-processed parquet data to build index-based charts (base 100)
+for the top 20 most modelable geopolitical/financial tickers.
 
-Filters to geopolitical+financial contracts only, selects top 20 most modelable,
-normalizes probabilities across contract rolls, and generates clean charts.
-
-Usage: python run.py
-Output: output/charts/*.png (top 20 modelable Tickers)
+Key features:
+- Index construction (base 100) instead of raw probability
+- Gap detection: breaks lines at >7 day gaps
+- Better dedup: separates contracts by expiration year/cycle
+- Geopolitical/war focus with minimum quota
+- Modelability scoring favoring continuous data
 """
 
 import pandas as pd
 import numpy as np
 import json
-import os
 import re
 import warnings
 from pathlib import Path
 from datetime import datetime
-from collections import defaultdict, Counter
 
 import matplotlib
 matplotlib.use('Agg')
@@ -30,12 +29,12 @@ import matplotlib.dates as mdates
 warnings.filterwarnings('ignore')
 
 # Paths
-BASKET_ENGINE = Path("../basket-engine/data")
+DATA_DIR = Path("../basket-engine/data/processed")
 OUTPUT_DIR = Path("output")
 CHARTS_DIR = OUTPUT_DIR / "charts"
 CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Plot style - clean and professional
+# Plot style
 plt.rcParams.update({
     'figure.figsize': (14, 7),
     'font.size': 11,
@@ -49,630 +48,346 @@ plt.rcParams.update({
     'font.family': 'sans-serif',
 })
 
-# Categories to KEEP (geopolitical + financial)
-GEO_FINANCE_CATEGORIES = {
-    'us_elections', 'crypto_digital', 'global_politics', 'us_economic',
-    'middle_east', 'fed_monetary_policy', 'russia_ukraine', 'energy_commodities',
-    'us_military', 'venezuela', 'china_geopolitics', 'legal_regulatory',
+# Categories
+GEO_CONFLICT_CATEGORIES = {
+    'russia_ukraine', 'middle_east', 'global_politics', 'china_geopolitics',
+    'us_military', 'venezuela',
 }
 
-# =============================================================================
-# STEP 1: Load and classify markets
-# =============================================================================
+KEEP_CATEGORIES = GEO_CONFLICT_CATEGORIES | {
+    'fed_monetary_policy', 'crypto_digital', 'us_elections', 'us_economic',
+    'legal_regulatory', 'energy_commodities',
+}
 
-def load_markets():
-    """Load all markets, filter to geo+finance only."""
-    print("=" * 60)
-    print("STEP 1: Loading markets (geo+finance only)")
-    print("=" * 60)
+EXCLUDE_CATEGORIES = {
+    'sports', 'entertainment',
+}
 
-    markets = pd.read_parquet(BASKET_ENGINE / "processed/markets.parquet")
-    print(f"  Total markets: {len(markets):,}")
-
-    classifications = pd.read_parquet(BASKET_ENGINE / "processed/market_classifications.parquet")
-    markets = markets.merge(classifications[['market_id', 'category']], on='market_id', how='left')
-
-    # Filter to geo+finance only
-    filtered = markets[markets['category'].isin(GEO_FINANCE_CATEGORIES)]
-    print(f"  After geo+finance filter: {len(filtered):,}")
-
-    category_counts = filtered['category'].value_counts()
-    for cat, count in category_counts.items():
-        print(f"    {cat}: {count:,}")
-
-    return markets, filtered, category_counts
+GAP_THRESHOLD_DAYS = 7
+CHAIN_GAP_THRESHOLD_DAYS = 30
+MIN_DATA_POINTS = 30
+MIN_GEO_IN_TOP20 = 10
 
 
-# =============================================================================
-# STEP 2: Ticker mapping
-# =============================================================================
-
-def normalize_title(title):
-    """Normalize market title to recurring Ticker concept."""
-    if pd.isna(title):
-        return ""
-
-    n = str(title)
-
-    n = re.sub(r'\bafter\s+the\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s+meeting\b',
-               'after meeting', n, flags=re.I)
-    n = re.sub(r'\bafter\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s+meeting\b',
-               'after meeting', n, flags=re.I)
-    n = re.sub(r'\bby\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}\b',
-               'by [timeframe]', n, flags=re.I)
-    n = re.sub(r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b', '', n, flags=re.I)
-    n = re.sub(r'\b20[2-9]\d\b', '', n)
-    n = re.sub(r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\b', '', n, flags=re.I)
-    n = re.sub(r'\bQ[1-4]\b', '', n, flags=re.I)
-    n = re.sub(r'\bafter\s+(the\s+)?meeting\b', 'after meeting', n, flags=re.I)
-    n = re.sub(r'\bbefore\s+20[2-9]\d\b', 'before [year]', n, flags=re.I)
-    n = re.sub(r'\bby\s+20[2-9]\d\b', 'by [year]', n, flags=re.I)
-    n = re.sub(r'\b20[2-9]\d[-\u2013]20[2-9]\d\b', '[daterange]', n)
-    n = re.sub(r'\$(\d+)[kK]\b', lambda m: f'${m.group(1)},000', n)
-    n = re.sub(r'^Will\s+the\s+', '', n, flags=re.I)
-    n = re.sub(r'^Will\s+', '', n, flags=re.I)
-    n = re.sub(r'\bdecreases\b', 'decrease', n, flags=re.I)
-    n = re.sub(r'\bincreases\b', 'increase', n, flags=re.I)
-    n = re.sub(r'\breaches\b', 'reach', n, flags=re.I)
-    n = re.sub(r'\bwins\b', 'win', n, flags=re.I)
-    n = re.sub(r'\s+in\s*\?\s*$', '?', n)
-    n = re.sub(r'\s+in\s*$', '', n)
-    n = re.sub(r'\s+', ' ', n).strip()
-    n = re.sub(r'^[^\w\$]+|[^\w\?\!]+$', '', n).strip()
-
-    return n
+def load_data():
+    """Load all parquet files."""
+    print("Loading data...")
+    ts = pd.read_parquet(DATA_DIR / "ticker_timeseries_raw.parquet")
+    tm = pd.read_parquet(DATA_DIR / "ticker_mapping.parquet")
+    mc = pd.read_parquet(DATA_DIR / "market_classifications.parquet")
+    markets = pd.read_parquet(DATA_DIR / "markets.parquet")
+    
+    ts['date'] = pd.to_datetime(ts['date'])
+    tm['end_date_parsed'] = pd.to_datetime(tm['end_date_parsed'], errors='coerce')
+    
+    print(f"  Timeseries: {len(ts):,} rows, {ts['ticker_id'].nunique()} tickers")
+    print(f"  Markets: {len(markets):,}")
+    return ts, tm, mc, markets
 
 
-def build_ticker_mapping(markets):
-    """Map all CUSIPs to Tickers using exact matching on normalized titles."""
-    print("\n" + "=" * 60)
-    print("STEP 2: Building Ticker mapping")
-    print("=" * 60)
-
-    markets = markets.copy()
-    markets['normalized'] = markets['title'].apply(normalize_title)
-    markets['end_date_parsed'] = pd.to_datetime(markets['end_date'], errors='coerce')
-
-    ticker_groups = markets.groupby('normalized')
-
-    ticker_mapping = []
-    ticker_chains = {}
-    ticker_id_counter = 0
-
-    for norm_title, group in ticker_groups:
-        if not norm_title:
-            continue
-
-        tid = f"ticker_{ticker_id_counter:06d}"
-        ticker_id_counter += 1
-
-        sorted_group = group.sort_values('end_date_parsed')
-
-        for _, row in sorted_group.iterrows():
-            ticker_mapping.append({
-                'market_id': row['market_id'],
-                'ticker_id': tid,
-                'ticker_name': norm_title,
-                'title': row['title'],
-                'event_slug': row.get('event_slug', ''),
-                'end_date': str(row.get('end_date', '')),
-                'category': row.get('category', ''),
-            })
-
-        chain_markets = []
-        for _, row in sorted_group.iterrows():
-            chain_markets.append({
-                'market_id': row['market_id'],
-                'title': row['title'],
-                'end_date': str(row.get('end_date', '')),
-            })
-
-        ticker_chains[tid] = {
-            'ticker_id': tid,
-            'ticker_name': norm_title,
-            'market_count': len(group),
-            'markets': chain_markets,
-            'category': group['category'].mode().iloc[0] if not group['category'].mode().empty else '',
-        }
-
-    mapping_df = pd.DataFrame(ticker_mapping)
-
-    total_tickers = len(ticker_chains)
-    rollable = sum(1 for v in ticker_chains.values() if v['market_count'] >= 2)
-
-    print(f"  Total Tickers: {total_tickers:,}")
-    print(f"  Rollable (2+ CUSIPs): {rollable:,}")
-    print(f"  Max CUSIPs per Ticker: {max(v['market_count'] for v in ticker_chains.values())}")
-
-    return mapping_df, ticker_chains
+def get_ticker_categories(tm, mc):
+    """Get category for each ticker_id."""
+    merged = tm.merge(mc[['market_id', 'category']], on='market_id', how='left')
+    return merged.groupby('ticker_id')['category'].agg(
+        lambda x: x.mode().iloc[0] if len(x.mode()) > 0 else 'unknown'
+    )
 
 
-# =============================================================================
-# STEP 3: Build continuous time series with normalization
-# =============================================================================
-
-def load_candle_data(market_id, markets_df):
-    """Load price data for a single CUSIP."""
-    row = markets_df[markets_df['market_id'] == market_id]
-    if row.empty:
-        return None
-    row = row.iloc[0]
-
-    platform = row.get('platform', '')
-
-    if 'poly' in str(market_id).lower() or platform == 'polymarket':
-        cond_id = row.get('condition_id', '')
-        if not cond_id:
-            return None
-        candle_path = BASKET_ENGINE / f"raw/polymarket/candles_{cond_id}.json"
-        if not candle_path.exists():
-            return None
-        try:
-            with open(candle_path) as f:
-                data = json.load(f)
-            if not data:
-                return None
-            if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list):
-                flat = []
-                for sublist in data:
-                    if isinstance(sublist, list):
-                        flat.extend(sublist)
-                data = flat
-            if not data or not isinstance(data, list):
-                return None
-            rows = []
-            for item in data:
-                if not isinstance(item, dict):
-                    continue
-                ts = item.get('end_period_ts')
-                price = item.get('price', {})
-                if isinstance(price, dict):
-                    close_str = price.get('close_dollars', None)
-                else:
-                    close_str = None
-                vol = item.get('volume', 0)
-                if ts and close_str:
-                    try:
-                        rows.append({
-                            'date': pd.to_datetime(int(ts), unit='s', errors='coerce'),
-                            'close': float(close_str),
-                            'volume': float(vol) if vol else 0,
-                        })
-                    except (ValueError, TypeError):
-                        continue
-            if not rows:
-                try:
-                    df = pd.DataFrame(data)
-                    if 't' in df.columns:
-                        df['date'] = pd.to_datetime(df['t'], unit='s', errors='coerce')
-                        df['close'] = pd.to_numeric(df.get('c', 0), errors='coerce')
-                        df['volume'] = pd.to_numeric(df.get('v', 0), errors='coerce')
-                    else:
-                        return None
-                except:
-                    return None
-            else:
-                df = pd.DataFrame(rows)
-            df = df.dropna(subset=['date', 'close'])
-            df = df.sort_values('date').drop_duplicates('date')
-            return df[['date', 'close', 'volume']].reset_index(drop=True)
-        except:
-            return None
-
-    elif 'kalshi' in str(market_id).lower() or platform == 'kalshi':
-        ticker = row.get('ticker', '')
-        if not ticker:
-            return None
-        trade_path = BASKET_ENGINE / f"raw/kalshi/trades_{ticker}.json"
-        if not trade_path.exists():
-            return None
-        try:
-            with open(trade_path) as f:
-                data = json.load(f)
-            if not data:
-                return None
-            df = pd.DataFrame(data)
-            df['date'] = pd.to_datetime(df.get('created_time', df.get('ts', '')), errors='coerce')
-            df['close'] = pd.to_numeric(df.get('yes_price', df.get('price', 0)), errors='coerce') / 100.0
-            df = df.dropna(subset=['date', 'close'])
-            df['date'] = df['date'].dt.date
-            daily = df.groupby('date').agg({'close': 'last'}).reset_index()
-            daily['date'] = pd.to_datetime(daily['date'])
-            daily['volume'] = 0
-            return daily[['date', 'close', 'volume']].reset_index(drop=True)
-        except:
-            return None
-
-    return None
+def check_chain_continuity(ts_data, max_gap_days=CHAIN_GAP_THRESHOLD_DAYS):
+    """Check if a ticker's constituent contracts form a continuous chain.
+    Returns True if no gap between consecutive contracts exceeds max_gap_days."""
+    if len(ts_data) < 2:
+        return True
+    
+    # Check gaps between different cusips
+    sorted_data = ts_data.sort_values('date')
+    cusip_changes = sorted_data['active_cusip'] != sorted_data['active_cusip'].shift(1)
+    change_indices = sorted_data.index[cusip_changes & (sorted_data.index != sorted_data.index[0])]
+    
+    for idx in change_indices:
+        prev_idx = sorted_data.index[sorted_data.index.get_loc(idx) - 1]
+        gap = (sorted_data.loc[idx, 'date'] - sorted_data.loc[prev_idx, 'date']).days
+        if gap > max_gap_days:
+            return False
+    return True
 
 
-def normalize_probability_at_roll(combined, cusip_data):
+def compute_modelability(ts_data):
+    """Compute modelability score for a ticker's timeseries.
+    Score = data_points * time_span_days / (1 + num_gaps) / (1 + max_jump_size * 10)
     """
-    Normalize probabilities across contract rolls using annualized rate.
+    if len(ts_data) < MIN_DATA_POINTS:
+        return 0.0
     
-    At each roll point, converts contract probabilities to annualized rates
-    using: P_annualized = 1 - (1 - P_contract)^(365 / days_to_expiry)
+    sorted_data = ts_data.sort_values('date')
+    dates = sorted_data['date']
+    prices = sorted_data['price']
     
-    Then applies ratio adjustment so the series is continuous.
-    """
-    if len(combined) < 2:
-        return combined
+    span_days = (dates.max() - dates.min()).days
+    if span_days < 1:
+        return 0.0
     
-    combined = combined.copy()
+    # Count gaps >7 days
+    day_diffs = dates.diff().dt.days
+    num_gaps = (day_diffs > GAP_THRESHOLD_DAYS).sum()
     
-    # Build a lookup: market_id -> end_date
-    end_dates = {}
-    for cd in cusip_data:
-        end_dates[cd['market_id']] = cd['end_date']
+    # Max single-day price jump
+    price_changes = prices.diff().abs()
+    max_jump = price_changes.max() if len(price_changes) > 1 else 0.0
+    if pd.isna(max_jump):
+        max_jump = 0.0
     
-    # Find roll points
-    roll_indices = combined.index[combined['is_roll']].tolist()
+    score = len(ts_data) * span_days / (1 + num_gaps) / (1 + max_jump * 10)
+    return score
+
+
+def insert_gap_nans(dates, values, gap_days=GAP_THRESHOLD_DAYS):
+    """Insert NaN values at gaps to break the line in matplotlib."""
+    if len(dates) < 2:
+        return dates, values
     
-    for ri in roll_indices:
-        if ri == 0:
-            continue
+    new_dates = []
+    new_values = []
+    
+    for i in range(len(dates)):
+        new_dates.append(dates.iloc[i])
+        new_values.append(values.iloc[i])
         
-        prev_idx = ri - 1
-        prev_close = combined.loc[prev_idx, 'close']
-        curr_close = combined.loc[ri, 'close']
-        
-        prev_cusip = combined.loc[prev_idx, 'cusip']
-        curr_cusip = combined.loc[ri, 'cusip']
-        curr_date = combined.loc[ri, 'date']
-        
-        prev_end = end_dates.get(prev_cusip)
-        curr_end = end_dates.get(curr_cusip)
-        
-        # Try annualized normalization
-        if pd.notna(prev_end) and pd.notna(curr_end):
-            prev_days = max((prev_end - curr_date).days, 1)
-            curr_days = max((curr_end - curr_date).days, 1)
-            
-            # Convert both to annualized probability
-            prev_ann = 1 - (1 - np.clip(prev_close, 0.001, 0.999)) ** (365.0 / prev_days)
-            curr_ann = 1 - (1 - np.clip(curr_close, 0.001, 0.999)) ** (365.0 / curr_days)
-            
-            if curr_ann > 0.001:
-                ratio = prev_ann / curr_ann
-            else:
-                ratio = 1.0
-        else:
-            # Fallback: simple ratio to eliminate jump
-            if curr_close > 0.001:
-                ratio = prev_close / curr_close
-            else:
-                ratio = 1.0
-        
-        # Clamp ratio to avoid extreme adjustments
-        ratio = np.clip(ratio, 0.5, 2.0)
-        
-        # Apply ratio to all points from this roll onward until next roll
-        # Find next roll point
-        later_rolls = [r for r in roll_indices if r > ri]
-        next_roll = later_rolls[0] if later_rolls else len(combined)
-        
-        mask = (combined.index >= ri) & (combined.index < next_roll)
-        combined.loc[mask, 'close'] = combined.loc[mask, 'close'] * ratio
+        if i < len(dates) - 1:
+            gap = (dates.iloc[i + 1] - dates.iloc[i]).days
+            if gap > gap_days:
+                # Insert a NaN point to break the line
+                mid = dates.iloc[i] + pd.Timedelta(days=1)
+                new_dates.append(mid)
+                new_values.append(np.nan)
     
-    # Clip to valid probability range
-    combined['close'] = combined['close'].clip(0, 1)
-    
-    # Flag remaining jumps > 20% as data quality issues
-    combined['daily_change'] = combined['close'].diff().abs()
-    bad_jumps = combined['daily_change'] > 0.20
-    num_bad = bad_jumps.sum()
-    
-    # Interpolate over bad jumps (not at roll points, those are already handled)
-    bad_non_roll = bad_jumps & ~combined['is_roll']
-    if bad_non_roll.any():
-        combined.loc[bad_non_roll, 'close'] = np.nan
-        combined['close'] = combined['close'].interpolate(method='linear')
-        combined['close'] = combined['close'].ffill().bfill()
-    
-    combined = combined.drop(columns=['daily_change'], errors='ignore')
-    return combined
+    return pd.Series(new_dates), pd.Series(new_values, dtype=float)
 
-
-def build_ticker_timeseries(ticker_chains, markets_df, min_days=30):
-    """Build continuous time series for rollable Tickers with normalization."""
-    print("\n" + "=" * 60)
-    print("STEP 3: Building Ticker time series")
-    print("=" * 60)
-
-    rollable = {k: v for k, v in ticker_chains.items() if v['market_count'] >= 2}
-    print(f"  Processing {len(rollable)} rollable Tickers...")
-
-    all_raw = []
-    stats = {}
-    success = 0
-    no_data = 0
-    too_short = 0
-
-    for i, (tid, chain) in enumerate(rollable.items()):
-        if (i + 1) % 200 == 0:
-            print(f"  ... {i+1}/{len(rollable)}")
-
-        cusip_data = []
-        for m in chain['markets']:
-            df = load_candle_data(m['market_id'], markets_df)
-            if df is not None and len(df) > 0:
-                end_date = pd.to_datetime(m['end_date'], errors='coerce')
-                cusip_data.append({
-                    'market_id': m['market_id'],
-                    'title': m['title'],
-                    'end_date': end_date,
-                    'data': df,
-                })
-
-        if not cusip_data:
-            no_data += 1
-            continue
-
-        cusip_data.sort(key=lambda x: x['end_date'] if pd.notna(x['end_date']) else pd.Timestamp.max)
-
-        combined_rows = []
-        used_dates = set()
-
-        for ci, cusip in enumerate(cusip_data):
-            df = cusip['data']
-            is_last = (ci == len(cusip_data) - 1)
-
-            if is_last:
-                for _, row in df.iterrows():
-                    d = row['date'].date() if hasattr(row['date'], 'date') else row['date']
-                    if d not in used_dates:
-                        combined_rows.append({
-                            'date': row['date'],
-                            'close': row['close'],
-                            'volume': row.get('volume', 0),
-                            'cusip': cusip['market_id'],
-                            'is_roll': False,
-                        })
-                        used_dates.add(d)
-            else:
-                end = cusip['end_date']
-                for _, row in df.iterrows():
-                    d = row['date'].date() if hasattr(row['date'], 'date') else row['date']
-                    if d in used_dates:
-                        continue
-                    if pd.notna(end) and row['date'] > end:
-                        continue
-                    combined_rows.append({
-                        'date': row['date'],
-                        'close': row['close'],
-                        'volume': row.get('volume', 0),
-                        'cusip': cusip['market_id'],
-                        'is_roll': False,
-                    })
-                    used_dates.add(d)
-
-        if len(combined_rows) < min_days:
-            too_short += 1
-            continue
-
-        combined = pd.DataFrame(combined_rows).sort_values('date').reset_index(drop=True)
-
-        combined['is_roll'] = combined['cusip'] != combined['cusip'].shift(1)
-        combined.iloc[0, combined.columns.get_loc('is_roll')] = False
-
-        # Store original roll points before normalization
-        roll_count_raw = int(combined['is_roll'].sum())
-
-        # Normalize probabilities across rolls
-        combined = normalize_probability_at_roll(combined, cusip_data)
-
-        combined['ticker_id'] = tid
-        combined['ticker_name'] = chain['ticker_name']
-        all_raw.append(combined)
-
-        stats[tid] = {
-            'ticker_name': chain['ticker_name'],
-            'cusip_count': chain['market_count'],
-            'data_points': len(combined),
-            'duration_days': (combined['date'].max() - combined['date'].min()).days,
-            'roll_count': roll_count_raw,
-            'start_date': str(combined['date'].min().date()),
-            'end_date': str(combined['date'].max().date()),
-            'category': chain.get('category', ''),
-        }
-        success += 1
-
-    print(f"\n  Results:")
-    print(f"    Successful: {success}")
-    print(f"    No data: {no_data}")
-    print(f"    Too short (<{min_days}d): {too_short}")
-
-    raw_df = pd.concat(all_raw, ignore_index=True) if all_raw else pd.DataFrame()
-    print(f"    Total data points: {len(raw_df):,}")
-
-    return raw_df, stats
-
-
-# =============================================================================
-# STEP 4: Select top 20 most modelable tickers
-# =============================================================================
-
-def select_top_modelable(raw_df, stats, top_n=20):
-    """
-    Rank tickers by modelability score and select top N.
-    Score = data_points * (1 / (1 + num_jumps)) * time_span_days
-    """
-    print("\n" + "=" * 60)
-    print(f"STEP 4: Selecting top {top_n} most modelable tickers")
-    print("=" * 60)
-
-    scores = {}
-    for tid, s in stats.items():
-        dp = s['data_points']
-        rolls = s['roll_count']
-        span = max(s['duration_days'], 1)
-
-        # Compute smoothness: std of daily changes
-        ticker_data = raw_df[raw_df['ticker_id'] == tid].sort_values('date')
-        daily_changes = ticker_data['close'].diff().abs()
-        smoothness = daily_changes.mean() if len(daily_changes) > 1 else 1.0
-        smoothness = max(smoothness, 0.001)
-
-        score = dp * (1.0 / (1 + rolls)) * span * (1.0 / (1 + smoothness * 10))
-        scores[tid] = score
-
-    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
-    top_tids = [tid for tid, _ in ranked[:top_n]]
-
-    print(f"\n  Top {top_n} tickers selected:")
-    print(f"  {'Rank':<5} {'Score':>10} {'Days':>6} {'Pts':>6} {'Rolls':>6}  {'Ticker Name'}")
-    print(f"  {'-'*5} {'-'*10} {'-'*6} {'-'*6} {'-'*6}  {'-'*40}")
-    for rank, tid in enumerate(top_tids, 1):
-        s = stats[tid]
-        sc = scores[tid]
-        print(f"  {rank:<5} {sc:>10.0f} {s['duration_days']:>6} {s['data_points']:>6} {s['roll_count']:>6}  {s['ticker_name'][:60]}")
-
-    return top_tids
-
-
-# =============================================================================
-# STEP 5: Generate clean charts
-# =============================================================================
 
 def sanitize_filename(name):
-    """Sanitize ticker name for use as filename."""
-    name = re.sub(r'[<>:"/\\|?*]', '_', name)
-    name = re.sub(r'[^\w\s\-_\.]', '_', name)
+    name = re.sub(r'[<>:"/\\|?*\[\]]', '_', name)
+    name = re.sub(r'[^\w\s\-_.]', '_', name)
     name = re.sub(r'\s+', '_', name)
     name = re.sub(r'_{2,}', '_', name)
-    name = name.strip('_')
-    return name[:100]
+    return name.strip('_')[:100]
 
 
-def generate_ticker_charts(raw_df, stats, top_tids):
-    """Generate one clean PNG chart per top ticker."""
-    print("\n" + "=" * 60)
-    print("STEP 5: Generating charts for top tickers")
+def main():
     print("=" * 60)
-
-    # Clear old charts
+    print("  PREDICTION MARKET INDEX PIPELINE")
+    print(f"  {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    print("=" * 60)
+    
+    ts, tm, mc, markets = load_data()
+    ticker_cats = get_ticker_categories(tm, mc)
+    
+    # Get ticker names
+    ticker_names = tm.groupby('ticker_id')['ticker_name'].first()
+    ticker_titles = tm.groupby('ticker_id')['title'].first()
+    ticker_market_counts = tm.groupby('ticker_id')['market_id'].count()
+    
+    # Filter categories
+    tickers_in_ts = ts['ticker_id'].unique()
+    print(f"\nFiltering {len(tickers_in_ts)} tickers...")
+    
+    kept_tickers = []
+    excluded = 0
+    for tid in tickers_in_ts:
+        cat = ticker_cats.get(tid, 'unknown')
+        if cat in EXCLUDE_CATEGORIES:
+            excluded += 1
+            continue
+        if cat not in KEEP_CATEGORIES and cat != 'unknown':
+            excluded += 1
+            continue
+        kept_tickers.append(tid)
+    
+    print(f"  Kept: {len(kept_tickers)}, Excluded: {excluded}")
+    
+    # Compute scores
+    print("\nComputing modelability scores...")
+    scores = {}
+    ticker_meta = {}
+    
+    for tid in kept_tickers:
+        data = ts[ts['ticker_id'] == tid].sort_values('date')
+        if len(data) < MIN_DATA_POINTS:
+            continue
+        
+        # Check chain continuity
+        if not check_chain_continuity(data):
+            continue
+        
+        score = compute_modelability(data)
+        if score <= 0:
+            continue
+        
+        cat = ticker_cats.get(tid, 'unknown')
+        name = ticker_names.get(tid, tid)
+        
+        dates = data['date']
+        day_diffs = dates.diff().dt.days
+        num_gaps = int((day_diffs > GAP_THRESHOLD_DAYS).sum())
+        max_jump = float(data['price'].diff().abs().max())
+        
+        scores[tid] = score
+        ticker_meta[tid] = {
+            'ticker_name': name,
+            'category': cat,
+            'data_points': len(data),
+            'span_days': (dates.max() - dates.min()).days,
+            'num_gaps': num_gaps,
+            'max_jump': round(max_jump, 4),
+            'num_contracts': int(data['active_cusip'].nunique()),
+            'start_date': str(dates.min().date()),
+            'end_date': str(dates.max().date()),
+            'is_geo': cat in GEO_CONFLICT_CATEGORIES,
+        }
+    
+    print(f"  Scoreable tickers: {len(scores)}")
+    
+    # Select top 20 with geo quota
+    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    
+    geo_tickers = [(tid, s) for tid, s in ranked if ticker_meta[tid]['is_geo']]
+    non_geo_tickers = [(tid, s) for tid, s in ranked if not ticker_meta[tid]['is_geo']]
+    
+    # Take top geo first to meet quota, then fill with best overall
+    top20 = []
+    geo_count = 0
+    
+    # First pass: add tickers in score order, ensuring geo quota
+    geo_added = []
+    non_geo_added = []
+    
+    for tid, s in ranked:
+        if ticker_meta[tid]['is_geo']:
+            geo_added.append((tid, s))
+        else:
+            non_geo_added.append((tid, s))
+    
+    # Ensure at least MIN_GEO_IN_TOP20 geo tickers
+    # Take top geo tickers first
+    for tid, s in geo_added[:MIN_GEO_IN_TOP20]:
+        top20.append(tid)
+    
+    # Fill remaining slots with best overall (excluding already added)
+    remaining = 20 - len(top20)
+    all_remaining = [(tid, s) for tid, s in ranked if tid not in set(top20)]
+    for tid, s in all_remaining[:remaining]:
+        top20.append(tid)
+    
+    # If we don't have enough geo, just take what we have
+    if len(top20) < 20:
+        for tid, s in ranked:
+            if tid not in set(top20):
+                top20.append(tid)
+            if len(top20) >= 20:
+                break
+    
+    top20 = top20[:20]
+    
+    # Print results
+    print(f"\n{'='*80}")
+    print(f"TOP 20 TICKERS")
+    print(f"{'='*80}")
+    print(f"{'#':>3} {'Score':>10} {'Cat':>25} {'Pts':>5} {'Span':>5} {'Gaps':>4} {'Name'}")
+    print(f"{'-'*3} {'-'*10} {'-'*25} {'-'*5} {'-'*5} {'-'*4} {'-'*50}")
+    
+    geo_in_top = 0
+    for i, tid in enumerate(top20, 1):
+        m = ticker_meta[tid]
+        s = scores[tid]
+        geo_flag = '🌍' if m['is_geo'] else '  '
+        if m['is_geo']:
+            geo_in_top += 1
+        print(f"{i:>3} {s:>10.0f} {m['category']:>25} {m['data_points']:>5} {m['span_days']:>5} {m['num_gaps']:>4} {geo_flag} {m['ticker_name'][:55]}")
+    
+    print(f"\nGeopolitical/conflict in top 20: {geo_in_top}")
+    
+    # Generate charts
+    print(f"\nGenerating charts...")
     for f in CHARTS_DIR.glob('*.png'):
         f.unlink()
-
-    if raw_df.empty:
-        print("  No data for charts")
-        return
-
-    print(f"  Generating {len(top_tids)} charts...")
-
-    for rank, ticker_id in enumerate(top_tids, 1):
-        ticker_data = raw_df[raw_df['ticker_id'] == ticker_id].sort_values('date')
-        if ticker_data.empty:
-            continue
-
-        ticker_name = ticker_data['ticker_name'].iloc[0]
-        ticker_stats = stats.get(ticker_id, {})
-
+    
+    for rank, tid in enumerate(top20, 1):
+        data = ts[ts['ticker_id'] == tid].sort_values('date').reset_index(drop=True)
+        m = ticker_meta[tid]
+        
+        # Build index (base 100)
+        first_price = data['price'].iloc[0]
+        if first_price <= 0:
+            first_price = data['price'][data['price'] > 0].iloc[0] if (data['price'] > 0).any() else 0.01
+        
+        index_values = 100.0 * data['price'] / first_price
+        
+        # Insert NaN at gaps to break lines
+        plot_dates, plot_values = insert_gap_nans(data['date'], index_values)
+        
         fig, ax = plt.subplots(figsize=(14, 7))
-
-        # Main line - raw data, no smoothing
-        ax.plot(ticker_data['date'], ticker_data['close'],
-                linewidth=1.2, color='#2c3e50', zorder=3)
-
-        # Roll points - subtle
-        rolls = ticker_data[ticker_data['is_roll']]
-        if len(rolls) > 0:
-            for _, roll_row in rolls.iterrows():
-                ax.axvline(x=roll_row['date'], color='#bdc3c7', linewidth=0.8,
-                          linestyle=':', alpha=0.6, zorder=1)
-
+        
+        # Main line
+        ax.plot(plot_dates, plot_values, linewidth=1.2, color='#2c3e50', zorder=3)
+        
+        # Roll points as subtle vertical lines
+        rolls = data[data['is_roll_point'] == True]
+        for _, row in rolls.iterrows():
+            ax.axvline(x=row['date'], color='#bdc3c7', linewidth=0.8,
+                      linestyle=':', alpha=0.5, zorder=1)
+        
+        # Base 100 reference line
+        ax.axhline(y=100, color='#95a5a6', linewidth=0.5, linestyle='-', alpha=0.3)
+        
         # Y-axis
-        ax.set_ylabel('Probability', fontsize=13)
-        ax.set_ylim(-0.02, 1.02)
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.0%}'))
-
-        # X-axis with prominent year labels
+        ax.set_ylabel('Index Level (base = 100)', fontsize=13)
+        
+        # X-axis with prominent years
         ax.xaxis.set_major_locator(mdates.YearLocator())
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
         ax.xaxis.set_minor_locator(mdates.MonthLocator(bymonth=[1, 4, 7, 10]))
         ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
-
-        # Make year labels prominent
         ax.tick_params(axis='x', which='major', labelsize=14, length=8, width=1.5, pad=8)
         ax.tick_params(axis='x', which='minor', labelsize=9, length=4, colors='#888888')
-
-        ax.set_xlabel('', fontsize=1)  # No xlabel, year is self-explanatory
-
+        ax.set_xlabel('')
+        
         # Title
-        ax.set_title(ticker_name, fontsize=15, fontweight='bold', pad=15)
-
-        # Subtitle with stats
-        duration = ticker_stats.get('duration_days', 0)
-        data_points = ticker_stats.get('data_points', 0)
-        cat = ticker_stats.get('category', '')
-        subtitle = f"{cat} · {duration}d span · {data_points:,} data points"
+        ax.set_title(m['ticker_name'], fontsize=15, fontweight='bold', pad=15)
+        
+        # Subtitle
+        subtitle = (f"{m['category']} · {m['start_date']} → {m['end_date']} · "
+                    f"{m['data_points']:,} pts · {m['num_contracts']} contracts · "
+                    f"{m['num_gaps']} gaps")
         ax.text(0.5, 1.01, subtitle, transform=ax.transAxes,
                 ha='center', va='bottom', fontsize=10, color='#888888')
-
-        # Clean grid
+        
+        # Grid
         ax.grid(True, which='major', alpha=0.15, linestyle='-')
         ax.grid(True, which='minor', alpha=0.08, linestyle='-')
-
-        # Remove top and right spines
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
-
+        
         plt.tight_layout()
-
-        filename = f"{rank:02d}_{sanitize_filename(ticker_name)}.png"
-        filepath = CHARTS_DIR / filename
-        plt.savefig(filepath, dpi=150, bbox_inches='tight', facecolor='white')
+        filename = f"{rank:02d}_{sanitize_filename(m['ticker_name'])}.png"
+        plt.savefig(CHARTS_DIR / filename, dpi=150, bbox_inches='tight', facecolor='white')
         plt.close()
-
-    print(f"  Generated: {len(top_tids)} charts in {CHARTS_DIR}/")
-
-
-# =============================================================================
-# MAIN
-# =============================================================================
-
-def main():
-    print("=" * 60)
-    print("  PREDICTION MARKET TICKER TIME SERIES")
-    print("  " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    print("=" * 60)
-
-    # Step 1: Load markets (geo+finance only)
-    markets, filtered, category_counts = load_markets()
-
-    # Step 2: Build ticker mapping (on filtered data)
-    mapping_df, ticker_chains = build_ticker_mapping(filtered)
-
-    # Step 3: Build time series with normalization
-    raw_df, stats = build_ticker_timeseries(ticker_chains, markets)
-
-    # Step 4: Select top 20 most modelable
-    top_tids = select_top_modelable(raw_df, stats, top_n=20)
-
-    # Step 5: Generate charts for top 20 only
-    generate_ticker_charts(raw_df, stats, top_tids)
-
-    # Save results
+    
+    print(f"  Generated {len(top20)} charts in {CHARTS_DIR}/")
+    
+    # Save results JSON
     results = {
         'top_20_tickers': [
-            {'rank': i+1, 'ticker_id': tid, **stats[tid]}
-            for i, tid in enumerate(top_tids)
+            {'rank': i + 1, 'ticker_id': tid, 'score': round(scores[tid], 1), **ticker_meta[tid]}
+            for i, tid in enumerate(top20)
         ],
-        'total_geo_finance_tickers': len(stats),
+        'total_scored_tickers': len(scores),
+        'geo_in_top20': geo_in_top,
         'generated_at': datetime.now().isoformat(),
     }
     with open(OUTPUT_DIR / 'top20_results.json', 'w') as f:
         json.dump(results, f, indent=2)
-
-    print("\n" + "=" * 60)
-    print("  SUMMARY")
-    print("=" * 60)
-    print(f"  Total geo+finance tickers with time series: {len(stats)}")
-    print(f"  Top 20 charts generated in: {CHARTS_DIR}/")
-    print(f"  Results saved to: {OUTPUT_DIR}/top20_results.json")
-    print("=" * 60)
+    
+    print(f"\n  Results saved to {OUTPUT_DIR}/top20_results.json")
     print("  DONE")
-    print("=" * 60)
 
 
 if __name__ == '__main__':
