@@ -431,12 +431,20 @@ def main():
         data = ts[ts['ticker_id'] == tid].sort_values('date').reset_index(drop=True)
         m = ticker_meta[tid]
         
-        # Build index (base 100) from raw price
-        first_price = data['price'].iloc[0]
-        if first_price <= 0:
-            first_price = data['price'][data['price'] > 0].iloc[0] if (data['price'] > 0).any() else 0.01
+        # Build index (base 100) with reset at each contract roll
+        # Each contract segment starts at 100, chained multiplicatively
+        index_values = pd.Series(dtype=float, index=data.index)
+        cusip_groups = (data['active_cusip'] != data['active_cusip'].shift(1)).cumsum()
+        chain_level = 100.0
         
-        index_values = 100.0 * data['price'] / first_price
+        for seg_id, seg_data in data.groupby(cusip_groups):
+            seg_first = seg_data['price'].iloc[0]
+            if seg_first <= 0:
+                seg_first = seg_data['price'][seg_data['price'] > 0].iloc[0] if (seg_data['price'] > 0).any() else 0.01
+            seg_index = chain_level * seg_data['price'] / seg_first
+            index_values.loc[seg_data.index] = seg_index
+            # Chain: next segment starts where this one's last value is
+            chain_level = seg_index.iloc[-1]
         
         # Insert NaN at display gaps to break lines
         plot_dates, plot_values = insert_gap_nans(data['date'], index_values, gap_days=DISPLAY_GAP_THRESHOLD_DAYS)
