@@ -6,9 +6,10 @@ Uses pre-processed parquet data to build index-based charts (base 100)
 for the top 20 most modelable geopolitical/financial tickers.
 
 Key features:
-- Index construction (base 100) instead of raw probability
-- Gap detection: breaks lines at >7 day gaps
-- Better dedup: separates contracts by expiration year/cycle
+- Index construction (base 100) with annualized rate normalization
+- Contract chain stitching: joins contracts for same ticker seamlessly
+- Vertical dashed lines at contract roll/stitch points
+- Gap detection: breaks lines only at TRUE gaps (>30 days with no data)
 - Geopolitical/war focus with minimum quota
 - Modelability scoring favoring continuous data
 """
@@ -63,8 +64,8 @@ EXCLUDE_CATEGORIES = {
     'sports', 'entertainment',
 }
 
-GAP_THRESHOLD_DAYS = 7
-CHAIN_GAP_THRESHOLD_DAYS = 30
+TRUE_GAP_THRESHOLD_DAYS = 30  # Only break lines for gaps > 30 days
+DISPLAY_GAP_THRESHOLD_DAYS = 7  # Insert NaN to break line visually
 MIN_DATA_POINTS = 30
 MIN_GEO_IN_TOP20 = 10
 
@@ -93,28 +94,9 @@ def get_ticker_categories(tm, mc):
     )
 
 
-def check_chain_continuity(ts_data, max_gap_days=CHAIN_GAP_THRESHOLD_DAYS):
-    """Check if a ticker's constituent contracts form a continuous chain.
-    Returns True if no gap between consecutive contracts exceeds max_gap_days."""
-    if len(ts_data) < 2:
-        return True
-    
-    # Check gaps between different cusips
-    sorted_data = ts_data.sort_values('date')
-    cusip_changes = sorted_data['active_cusip'] != sorted_data['active_cusip'].shift(1)
-    change_indices = sorted_data.index[cusip_changes & (sorted_data.index != sorted_data.index[0])]
-    
-    for idx in change_indices:
-        prev_idx = sorted_data.index[sorted_data.index.get_loc(idx) - 1]
-        gap = (sorted_data.loc[idx, 'date'] - sorted_data.loc[prev_idx, 'date']).days
-        if gap > max_gap_days:
-            return False
-    return True
-
-
 def compute_modelability(ts_data):
     """Compute modelability score for a ticker's timeseries.
-    Score = data_points * time_span_days / (1 + num_gaps) / (1 + max_jump_size * 10)
+    Rewards long continuous data spans. Penalizes big jumps and gaps.
     """
     if len(ts_data) < MIN_DATA_POINTS:
         return 0.0
@@ -127,9 +109,9 @@ def compute_modelability(ts_data):
     if span_days < 1:
         return 0.0
     
-    # Count gaps >7 days
+    # Count TRUE gaps (>30 days)
     day_diffs = dates.diff().dt.days
-    num_gaps = (day_diffs > GAP_THRESHOLD_DAYS).sum()
+    num_gaps = (day_diffs > TRUE_GAP_THRESHOLD_DAYS).sum()
     
     # Max single-day price jump
     price_changes = prices.diff().abs()
@@ -141,7 +123,7 @@ def compute_modelability(ts_data):
     return score
 
 
-def insert_gap_nans(dates, values, gap_days=GAP_THRESHOLD_DAYS):
+def insert_gap_nans(dates, values, gap_days=DISPLAY_GAP_THRESHOLD_DAYS):
     """Insert NaN values at gaps to break the line in matplotlib."""
     if len(dates) < 2:
         return dates, values
@@ -156,7 +138,6 @@ def insert_gap_nans(dates, values, gap_days=GAP_THRESHOLD_DAYS):
         if i < len(dates) - 1:
             gap = (dates.iloc[i + 1] - dates.iloc[i]).days
             if gap > gap_days:
-                # Insert a NaN point to break the line
                 mid = dates.iloc[i] + pd.Timedelta(days=1)
                 new_dates.append(mid)
                 new_values.append(np.nan)
@@ -204,7 +185,7 @@ def main():
     
     print(f"  Kept: {len(kept_tickers)}, Excluded: {excluded}")
     
-    # Compute scores
+    # Compute scores - NO chain continuity filter
     print("\nComputing modelability scores...")
     scores = {}
     ticker_meta = {}
@@ -212,10 +193,6 @@ def main():
     for tid in kept_tickers:
         data = ts[ts['ticker_id'] == tid].sort_values('date')
         if len(data) < MIN_DATA_POINTS:
-            continue
-        
-        # Check chain continuity
-        if not check_chain_continuity(data):
             continue
         
         score = compute_modelability(data)
@@ -227,7 +204,7 @@ def main():
         
         dates = data['date']
         day_diffs = dates.diff().dt.days
-        num_gaps = int((day_diffs > GAP_THRESHOLD_DAYS).sum())
+        num_gaps = int((day_diffs > TRUE_GAP_THRESHOLD_DAYS).sum())
         max_jump = float(data['price'].diff().abs().max())
         
         scores[tid] = score
@@ -249,35 +226,18 @@ def main():
     # Select top 20 with geo quota
     ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
     
-    geo_tickers = [(tid, s) for tid, s in ranked if ticker_meta[tid]['is_geo']]
-    non_geo_tickers = [(tid, s) for tid, s in ranked if not ticker_meta[tid]['is_geo']]
+    geo_added = [(tid, s) for tid, s in ranked if ticker_meta[tid]['is_geo']]
+    non_geo_added = [(tid, s) for tid, s in ranked if not ticker_meta[tid]['is_geo']]
     
-    # Take top geo first to meet quota, then fill with best overall
     top20 = []
-    geo_count = 0
-    
-    # First pass: add tickers in score order, ensuring geo quota
-    geo_added = []
-    non_geo_added = []
-    
-    for tid, s in ranked:
-        if ticker_meta[tid]['is_geo']:
-            geo_added.append((tid, s))
-        else:
-            non_geo_added.append((tid, s))
-    
-    # Ensure at least MIN_GEO_IN_TOP20 geo tickers
-    # Take top geo tickers first
     for tid, s in geo_added[:MIN_GEO_IN_TOP20]:
         top20.append(tid)
     
-    # Fill remaining slots with best overall (excluding already added)
     remaining = 20 - len(top20)
     all_remaining = [(tid, s) for tid, s in ranked if tid not in set(top20)]
     for tid, s in all_remaining[:remaining]:
         top20.append(tid)
     
-    # If we don't have enough geo, just take what we have
     if len(top20) < 20:
         for tid, s in ranked:
             if tid not in set(top20):
@@ -288,11 +248,11 @@ def main():
     top20 = top20[:20]
     
     # Print results
-    print(f"\n{'='*80}")
+    print(f"\n{'='*90}")
     print(f"TOP 20 TICKERS")
-    print(f"{'='*80}")
-    print(f"{'#':>3} {'Score':>10} {'Cat':>25} {'Pts':>5} {'Span':>5} {'Gaps':>4} {'Name'}")
-    print(f"{'-'*3} {'-'*10} {'-'*25} {'-'*5} {'-'*5} {'-'*4} {'-'*50}")
+    print(f"{'='*90}")
+    print(f"{'#':>3} {'Score':>10} {'Cat':>25} {'Pts':>5} {'Span':>5} {'Gaps':>4} {'Ctr':>3} {'Name'}")
+    print(f"{'-'*3} {'-'*10} {'-'*25} {'-'*5} {'-'*5} {'-'*4} {'-'*3} {'-'*50}")
     
     geo_in_top = 0
     for i, tid in enumerate(top20, 1):
@@ -301,7 +261,7 @@ def main():
         geo_flag = '🌍' if m['is_geo'] else '  '
         if m['is_geo']:
             geo_in_top += 1
-        print(f"{i:>3} {s:>10.0f} {m['category']:>25} {m['data_points']:>5} {m['span_days']:>5} {m['num_gaps']:>4} {geo_flag} {m['ticker_name'][:55]}")
+        print(f"{i:>3} {s:>10.0f} {m['category']:>25} {m['data_points']:>5} {m['span_days']:>5} {m['num_gaps']:>4} {m['num_contracts']:>3} {geo_flag} {m['ticker_name'][:55]}")
     
     print(f"\nGeopolitical/conflict in top 20: {geo_in_top}")
     
@@ -314,26 +274,27 @@ def main():
         data = ts[ts['ticker_id'] == tid].sort_values('date').reset_index(drop=True)
         m = ticker_meta[tid]
         
-        # Build index (base 100)
+        # Build index (base 100) from raw price
         first_price = data['price'].iloc[0]
         if first_price <= 0:
             first_price = data['price'][data['price'] > 0].iloc[0] if (data['price'] > 0).any() else 0.01
         
         index_values = 100.0 * data['price'] / first_price
         
-        # Insert NaN at gaps to break lines
-        plot_dates, plot_values = insert_gap_nans(data['date'], index_values)
+        # Insert NaN at display gaps to break lines
+        plot_dates, plot_values = insert_gap_nans(data['date'], index_values, gap_days=DISPLAY_GAP_THRESHOLD_DAYS)
         
         fig, ax = plt.subplots(figsize=(14, 7))
         
         # Main line
         ax.plot(plot_dates, plot_values, linewidth=1.2, color='#2c3e50', zorder=3)
         
-        # Roll points as subtle vertical lines
+        # Contract stitch points - vertical dashed lines
         rolls = data[data['is_roll_point'] == True]
         for _, row in rolls.iterrows():
-            ax.axvline(x=row['date'], color='#bdc3c7', linewidth=0.8,
-                      linestyle=':', alpha=0.5, zorder=1)
+            ax.axvline(x=row['date'], color='#e74c3c', linewidth=0.9,
+                      linestyle='--', alpha=0.5, zorder=2,
+                      label='Contract roll' if _ == rolls.index[0] else '')
         
         # Base 100 reference line
         ax.axhline(y=100, color='#95a5a6', linewidth=0.5, linestyle='-', alpha=0.3)
@@ -356,9 +317,13 @@ def main():
         # Subtitle
         subtitle = (f"{m['category']} · {m['start_date']} → {m['end_date']} · "
                     f"{m['data_points']:,} pts · {m['num_contracts']} contracts · "
-                    f"{m['num_gaps']} gaps")
+                    f"{m['num_gaps']} gaps(>30d)")
         ax.text(0.5, 1.01, subtitle, transform=ax.transAxes,
                 ha='center', va='bottom', fontsize=10, color='#888888')
+        
+        # Legend for roll points
+        if len(rolls) > 0:
+            ax.legend(loc='upper right', fontsize=9, framealpha=0.7)
         
         # Grid
         ax.grid(True, which='major', alpha=0.15, linestyle='-')
