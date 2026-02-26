@@ -158,7 +158,7 @@ def merge_related_tickers(ts, tm):
     for k in merged_into:
         del canon_groups[k]
     
-    # Only merge groups with 2+ tickers
+    # Only merge groups with 2+ tickers, but validate price compatibility
     merge_map = {}  # old_ticker_id -> new_super_ticker_id
     merged_count = 0
     
@@ -170,24 +170,60 @@ def merge_related_tickers(ts, tm):
         if len(tids_with_data) < 2:
             continue
         
-        # Use the ticker with most data as the "super" ticker
-        data_counts = {t: len(ts[ts['ticker_id'] == t]) for t in tids_with_data}
-        super_tid = max(data_counts, key=data_counts.get)
+        # Check price compatibility: only merge if median prices are in same order of magnitude
+        # "invade in 2025" (~5%) vs "invade before 2027" (~85%) should NOT merge
+        median_prices = {}
+        for t in tids_with_data:
+            sub = ts[ts['ticker_id'] == t]
+            median_prices[t] = sub['price'].median()
         
-        for tid in tids_with_data:
-            if tid != super_tid:
-                merge_map[tid] = super_tid
-                merged_count += 1
+        # Cluster by price similarity: group tickers where median prices are within 3x
+        compatible_groups = []
+        used = set()
+        for t in tids_with_data:
+            if t in used:
+                continue
+            group = [t]
+            used.add(t)
+            for t2 in tids_with_data:
+                if t2 in used:
+                    continue
+                ratio = max(median_prices[t], median_prices[t2]) / max(min(median_prices[t], median_prices[t2]), 0.001)
+                if ratio <= 3.0:
+                    group.append(t2)
+                    used.add(t2)
+            if len(group) >= 2:
+                compatible_groups.append(group)
+        
+        for group in compatible_groups:
+            data_counts = {t: len(ts[ts['ticker_id'] == t]) for t in group}
+            super_tid = max(data_counts, key=data_counts.get)
+            for tid in group:
+                if tid != super_tid:
+                    merge_map[tid] = super_tid
+                    merged_count += 1
     
     if merged_count > 0:
         print(f"  Merging {merged_count} related tickers into parent tickers")
         ts = ts.copy()
         ts['ticker_id'] = ts['ticker_id'].map(lambda x: merge_map.get(x, x))
         
-        # For overlapping dates, prefer the contract with nearest expiry
-        # (most relevant/liquid contract for that date)
-        ts = ts.sort_values(['ticker_id', 'date', 'cusip_end_date'])
+        # For overlapping dates, use FRONT-MONTH logic:
+        # Pick the contract with the nearest expiry that hasn't expired yet
+        ts['date_dt'] = pd.to_datetime(ts['date'])
+        ts['end_dt'] = pd.to_datetime(ts['cusip_end_date'], errors='coerce')
+        
+        # Front-month: prefer contract with nearest expiry AFTER the observation date
+        # For active contracts: days_to_expiry is small positive → sort ascending
+        # For expired contracts: make them sort after active ones
+        ts['days_to_end'] = (ts['end_dt'] - ts['date_dt']).dt.days
+        # Active contracts get their actual days_to_end (small = better)
+        # Expired contracts get 999999 so they sort last
+        ts['sort_key'] = ts['days_to_end'].where(ts['days_to_end'] >= 0, 999999)
+        ts = ts.sort_values(['ticker_id', 'date', 'sort_key'])
         ts = ts.drop_duplicates(subset=['ticker_id', 'date'], keep='first')
+        ts = ts.drop(columns=['date_dt', 'end_dt', 'days_to_end', 'sort_key'], errors='ignore')
+        ts = ts.sort_values(['ticker_id', 'date']).reset_index(drop=True)
     
     return ts
 
