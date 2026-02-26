@@ -431,20 +431,23 @@ def main():
         data = ts[ts['ticker_id'] == tid].sort_values('date').reset_index(drop=True)
         m = ticker_meta[tid]
         
-        # Build index (base 100) with reset at each contract roll
-        # Each contract segment starts at 100, chained multiplicatively
-        index_values = pd.Series(dtype=float, index=data.index)
-        cusip_groups = (data['active_cusip'] != data['active_cusip'].shift(1)).cumsum()
-        chain_level = 100.0
+        # Build index (base 100) using annualized hazard rate
+        # P_annual = 1 - (1 - P)^(365 / days_to_expiry)
+        # This normalizes across different contract horizons and doesn't crash
+        # to zero at expiry just because a contract resolved "No"
+        data_dates = pd.to_datetime(data['date'])
+        data_ends = pd.to_datetime(data['cusip_end_date'], errors='coerce')
         
-        for seg_id, seg_data in data.groupby(cusip_groups):
-            seg_first = seg_data['price'].iloc[0]
-            if seg_first <= 0:
-                seg_first = seg_data['price'][seg_data['price'] > 0].iloc[0] if (seg_data['price'] > 0).any() else 0.01
-            seg_index = chain_level * seg_data['price'] / seg_first
-            index_values.loc[seg_data.index] = seg_index
-            # Chain: next segment starts where this one's last value is
-            chain_level = seg_index.iloc[-1]
+        days_to_expiry = (data_ends - data_dates).dt.days.clip(lower=1)
+        raw_p = data['price'].clip(lower=0.0001, upper=0.9999)
+        
+        # Annualized probability
+        annualized = 1.0 - (1.0 - raw_p) ** (365.0 / days_to_expiry)
+        annualized = annualized.clip(lower=0.0001)
+        
+        # Build index from annualized rate
+        first_ann = annualized.iloc[0]
+        index_values = 100.0 * annualized / first_ann
         
         # Insert NaN at display gaps to break lines
         plot_dates, plot_values = insert_gap_nans(data['date'], index_values, gap_days=DISPLAY_GAP_THRESHOLD_DAYS)
