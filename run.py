@@ -86,6 +86,112 @@ def load_data():
     return ts, tm, mc, markets
 
 
+def merge_related_tickers(ts, tm):
+    """Merge tickers that represent the same underlying question across time.
+    
+    E.g., "China invade Taiwan in 2024", "...in 2025", "...before 2027" all become
+    one continuous series using the nearest-expiry active contract for each date.
+    """
+    from difflib import SequenceMatcher
+    
+    # Build canonical names by stripping year/date/timeframe suffixes aggressively
+    def canonical_name(name):
+        if not isinstance(name, str):
+            return ''
+        cleaned = name.lower()
+        # Remove date patterns
+        cleaned = re.sub(r'\b(in |before |by |by end of |by march|by june|by july|through )\d{0,4}\b', '', cleaned)
+        cleaned = re.sub(r'\b(january|february|march|april|may|june|july|august|september|october|november|december)\s*\d{0,2},?\s*\d{0,4}\b', '', cleaned)
+        cleaned = re.sub(r'\b\d{4}\b', '', cleaned)
+        # Remove [timeframe] and trailing prepositions
+        cleaned = re.sub(r'\[timeframe\]', '', cleaned)
+        cleaned = re.sub(r'\bby\s*$', '', cleaned)
+        cleaned = re.sub(r'\bbefore\s*$', '', cleaned)
+        cleaned = re.sub(r'\b(by )?end of\s*$', '', cleaned)
+        cleaned = re.sub(r'\bthrough\s*$', '', cleaned)
+        cleaned = re.sub(r'\bin\s*$', '', cleaned)
+        # Remove punctuation and normalize
+        cleaned = re.sub(r'[?,!.\[\],]', '', cleaned)
+        cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+        return cleaned
+    
+    ticker_names = tm.groupby('ticker_id')['ticker_name'].first()
+    
+    # Group by exact canonical first, then fuzzy merge groups
+    canon_groups = {}
+    for tid, name in ticker_names.items():
+        cn = canonical_name(name)
+        if not cn or len(cn) < 5:
+            continue
+        if cn not in canon_groups:
+            canon_groups[cn] = []
+        canon_groups[cn].append(tid)
+    
+    # Fuzzy merge ALL groups pairwise (use set for dedup)
+    group_keys = list(canon_groups.keys())
+    merged_into = {}
+    
+    # Build simple index: first 3 words -> list of keys
+    word_index = {}
+    for k in group_keys:
+        words = k.split()[:3]
+        prefix = ' '.join(words)
+        if prefix not in word_index:
+            word_index[prefix] = []
+        word_index[prefix].append(k)
+    
+    # Only fuzzy match within same prefix bucket (fast)
+    for prefix, keys in word_index.items():
+        if len(keys) < 2:
+            continue
+        for i in range(len(keys)):
+            if keys[i] in merged_into:
+                continue
+            for j in range(i + 1, len(keys)):
+                if keys[j] in merged_into:
+                    continue
+                ratio = SequenceMatcher(None, keys[i], keys[j]).ratio()
+                if ratio > 0.75:
+                    canon_groups[keys[i]].extend(canon_groups[keys[j]])
+                    merged_into[keys[j]] = keys[i]
+    
+    for k in merged_into:
+        del canon_groups[k]
+    
+    # Only merge groups with 2+ tickers
+    merge_map = {}  # old_ticker_id -> new_super_ticker_id
+    merged_count = 0
+    
+    for cn, tids in canon_groups.items():
+        if len(tids) < 2:
+            continue
+        # Check these tickers actually have timeseries data
+        tids_with_data = [t for t in tids if t in ts['ticker_id'].values]
+        if len(tids_with_data) < 2:
+            continue
+        
+        # Use the ticker with most data as the "super" ticker
+        data_counts = {t: len(ts[ts['ticker_id'] == t]) for t in tids_with_data}
+        super_tid = max(data_counts, key=data_counts.get)
+        
+        for tid in tids_with_data:
+            if tid != super_tid:
+                merge_map[tid] = super_tid
+                merged_count += 1
+    
+    if merged_count > 0:
+        print(f"  Merging {merged_count} related tickers into parent tickers")
+        ts = ts.copy()
+        ts['ticker_id'] = ts['ticker_id'].map(lambda x: merge_map.get(x, x))
+        
+        # For overlapping dates, prefer the contract with nearest expiry
+        # (most relevant/liquid contract for that date)
+        ts = ts.sort_values(['ticker_id', 'date', 'cusip_end_date'])
+        ts = ts.drop_duplicates(subset=['ticker_id', 'date'], keep='first')
+    
+    return ts
+
+
 def get_ticker_categories(tm, mc):
     """Get category for each ticker_id."""
     merged = tm.merge(mc[['market_id', 'category']], on='market_id', how='left')
@@ -113,8 +219,13 @@ def compute_modelability(ts_data):
     day_diffs = dates.diff().dt.days
     num_gaps = (day_diffs > TRUE_GAP_THRESHOLD_DAYS).sum()
     
-    # Max single-day price jump
-    price_changes = prices.diff().abs()
+    # Max single-day price jump (exclude roll points / contract switches)
+    if 'active_cusip' in sorted_data.columns:
+        cusip_changed = sorted_data['active_cusip'] != sorted_data['active_cusip'].shift(1)
+        price_changes = prices.diff().abs()
+        price_changes[cusip_changed] = 0  # Ignore jumps at contract boundaries
+    else:
+        price_changes = prices.diff().abs()
     max_jump = price_changes.max() if len(price_changes) > 1 else 0.0
     if pd.isna(max_jump):
         max_jump = 0.0
@@ -160,6 +271,8 @@ def main():
     print("=" * 60)
     
     ts, tm, mc, markets = load_data()
+    ts = merge_related_tickers(ts, tm)
+    print(f"  After merge: {len(ts):,} rows, {ts['ticker_id'].nunique()} tickers")
     ticker_cats = get_ticker_categories(tm, mc)
     
     # Get ticker names
