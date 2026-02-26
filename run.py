@@ -5,8 +5,11 @@ Prediction Market Ticker Generation Pipeline
 Takes ~20K raw prediction market contracts, maps them to recurring Tickers,
 and builds continuous time series by rolling contracts across expirations.
 
+Filters to geopolitical+financial contracts only, selects top 20 most modelable,
+normalizes probabilities across contract rolls, and generates clean charts.
+
 Usage: python run.py
-Output: output/charts/*.png (one per Ticker) + output/results.xlsx (one sheet per Ticker)
+Output: output/charts/*.png (top 20 modelable Tickers)
 """
 
 import pandas as pd
@@ -23,7 +26,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
-import seaborn as sns
 
 warnings.filterwarnings('ignore')
 
@@ -33,112 +35,91 @@ OUTPUT_DIR = Path("output")
 CHARTS_DIR = OUTPUT_DIR / "charts"
 CHARTS_DIR.mkdir(parents=True, exist_ok=True)
 
-# Plot style
+# Plot style - clean and professional
 plt.rcParams.update({
-    'figure.figsize': (12, 7),
+    'figure.figsize': (14, 7),
     'font.size': 11,
-    'axes.titlesize': 14,
+    'axes.titlesize': 15,
     'axes.labelsize': 12,
     'figure.facecolor': 'white',
     'axes.facecolor': 'white',
     'axes.grid': True,
-    'grid.alpha': 0.3,
+    'grid.alpha': 0.15,
+    'grid.linestyle': '--',
+    'font.family': 'sans-serif',
 })
+
+# Categories to KEEP (geopolitical + financial)
+GEO_FINANCE_CATEGORIES = {
+    'us_elections', 'crypto_digital', 'global_politics', 'us_economic',
+    'middle_east', 'fed_monetary_policy', 'russia_ukraine', 'energy_commodities',
+    'us_military', 'venezuela', 'china_geopolitics', 'legal_regulatory',
+}
 
 # =============================================================================
 # STEP 1: Load and classify markets
 # =============================================================================
 
 def load_markets():
-    """Load all markets and classifications."""
+    """Load all markets, filter to geo+finance only."""
     print("=" * 60)
-    print("STEP 1: Loading markets and classifications")
+    print("STEP 1: Loading markets (geo+finance only)")
     print("=" * 60)
-    
+
     markets = pd.read_parquet(BASKET_ENGINE / "processed/markets.parquet")
     print(f"  Total markets: {len(markets):,}")
-    
-    # Load classifications
+
     classifications = pd.read_parquet(BASKET_ENGINE / "processed/market_classifications.parquet")
     markets = markets.merge(classifications[['market_id', 'category']], on='market_id', how='left')
-    
-    # Filter stats
-    category_counts = markets['category'].value_counts()
-    sports = category_counts.get('sports', 0)
-    entertainment = category_counts.get('entertainment', 0)
-    print(f"  Sports markets: {sports:,}")
-    print(f"  Entertainment markets: {entertainment:,}")
-    
-    filtered = markets[~markets['category'].isin(['sports', 'entertainment'])]
-    print(f"  After filtering: {len(filtered):,}")
-    
+
+    # Filter to geo+finance only
+    filtered = markets[markets['category'].isin(GEO_FINANCE_CATEGORIES)]
+    print(f"  After geo+finance filter: {len(filtered):,}")
+
+    category_counts = filtered['category'].value_counts()
+    for cat, count in category_counts.items():
+        print(f"    {cat}: {count:,}")
+
     return markets, filtered, category_counts
 
 
 # =============================================================================
-# STEP 2: Ticker mapping (CUSIP → Ticker)
+# STEP 2: Ticker mapping
 # =============================================================================
 
 def normalize_title(title):
     """Normalize market title to recurring Ticker concept."""
     if pd.isna(title):
         return ""
-    
+
     n = str(title)
-    
-    # "after the [Month] [Year] meeting" → "after meeting"
+
     n = re.sub(r'\bafter\s+the\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s+meeting\b',
                'after meeting', n, flags=re.I)
     n = re.sub(r'\bafter\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\s+meeting\b',
                'after meeting', n, flags=re.I)
-    
-    # "by [Month] [Day]" → "by [timeframe]"
     n = re.sub(r'\bby\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}\b',
                'by [timeframe]', n, flags=re.I)
-    
-    # Strip month-year combinations
     n = re.sub(r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b', '', n, flags=re.I)
-    
-    # Strip standalone years
     n = re.sub(r'\b20[2-9]\d\b', '', n)
-    
-    # Strip standalone months
     n = re.sub(r'\b(January|February|March|April|May|June|July|August|September|October|November|December)\b', '', n, flags=re.I)
-    
-    # Quarter references
     n = re.sub(r'\bQ[1-4]\b', '', n, flags=re.I)
-    
-    # Normalize "after meeting" variants
     n = re.sub(r'\bafter\s+(the\s+)?meeting\b', 'after meeting', n, flags=re.I)
-    
-    # "before [year]", "by [year]"
     n = re.sub(r'\bbefore\s+20[2-9]\d\b', 'before [year]', n, flags=re.I)
     n = re.sub(r'\bby\s+20[2-9]\d\b', 'by [year]', n, flags=re.I)
-    
-    # Date ranges
-    n = re.sub(r'\b20[2-9]\d[-–]20[2-9]\d\b', '[daterange]', n)
-    
-    # Normalize dollar amounts: $150K → $150,000
+    n = re.sub(r'\b20[2-9]\d[-\u2013]20[2-9]\d\b', '[daterange]', n)
     n = re.sub(r'\$(\d+)[kK]\b', lambda m: f'${m.group(1)},000', n)
-    
-    # Strip "Will the" / "Will" prefix (Polymarket changed format)
     n = re.sub(r'^Will\s+the\s+', '', n, flags=re.I)
     n = re.sub(r'^Will\s+', '', n, flags=re.I)
-    
-    # Normalize verb forms
     n = re.sub(r'\bdecreases\b', 'decrease', n, flags=re.I)
     n = re.sub(r'\bincreases\b', 'increase', n, flags=re.I)
     n = re.sub(r'\breaches\b', 'reach', n, flags=re.I)
     n = re.sub(r'\bwins\b', 'win', n, flags=re.I)
-    
-    # Clean trailing "in ?" artifact
     n = re.sub(r'\s+in\s*\?\s*$', '?', n)
     n = re.sub(r'\s+in\s*$', '', n)
-    
-    # Clean whitespace
     n = re.sub(r'\s+', ' ', n).strip()
     n = re.sub(r'^[^\w\$]+|[^\w\?\!]+$', '', n).strip()
-    
+
     return n
 
 
@@ -147,27 +128,26 @@ def build_ticker_mapping(markets):
     print("\n" + "=" * 60)
     print("STEP 2: Building Ticker mapping")
     print("=" * 60)
-    
+
     markets = markets.copy()
     markets['normalized'] = markets['title'].apply(normalize_title)
     markets['end_date_parsed'] = pd.to_datetime(markets['end_date'], errors='coerce')
-    
-    # Group by normalized title (exact match)
+
     ticker_groups = markets.groupby('normalized')
-    
+
     ticker_mapping = []
     ticker_chains = {}
     ticker_id_counter = 0
-    
+
     for norm_title, group in ticker_groups:
         if not norm_title:
             continue
-        
+
         tid = f"ticker_{ticker_id_counter:06d}"
         ticker_id_counter += 1
-        
+
         sorted_group = group.sort_values('end_date_parsed')
-        
+
         for _, row in sorted_group.iterrows():
             ticker_mapping.append({
                 'market_id': row['market_id'],
@@ -178,7 +158,7 @@ def build_ticker_mapping(markets):
                 'end_date': str(row.get('end_date', '')),
                 'category': row.get('category', ''),
             })
-        
+
         chain_markets = []
         for _, row in sorted_group.iterrows():
             chain_markets.append({
@@ -186,33 +166,29 @@ def build_ticker_mapping(markets):
                 'title': row['title'],
                 'end_date': str(row.get('end_date', '')),
             })
-        
+
         ticker_chains[tid] = {
             'ticker_id': tid,
             'ticker_name': norm_title,
             'market_count': len(group),
             'markets': chain_markets,
+            'category': group['category'].mode().iloc[0] if not group['category'].mode().empty else '',
         }
-    
+
     mapping_df = pd.DataFrame(ticker_mapping)
-    
+
     total_tickers = len(ticker_chains)
     rollable = sum(1 for v in ticker_chains.values() if v['market_count'] >= 2)
-    
+
     print(f"  Total Tickers: {total_tickers:,}")
     print(f"  Rollable (2+ CUSIPs): {rollable:,}")
     print(f"  Max CUSIPs per Ticker: {max(v['market_count'] for v in ticker_chains.values())}")
-    
-    # Distribution
-    dist = Counter(v['market_count'] for v in ticker_chains.values())
-    for k in sorted(dist.keys())[:8]:
-        print(f"    {k} CUSIPs: {dist[k]:,} tickers")
-    
+
     return mapping_df, ticker_chains
 
 
 # =============================================================================
-# STEP 3: Build continuous time series
+# STEP 3: Build continuous time series with normalization
 # =============================================================================
 
 def load_candle_data(market_id, markets_df):
@@ -221,9 +197,9 @@ def load_candle_data(market_id, markets_df):
     if row.empty:
         return None
     row = row.iloc[0]
-    
+
     platform = row.get('platform', '')
-    
+
     if 'poly' in str(market_id).lower() or platform == 'polymarket':
         cond_id = row.get('condition_id', '')
         if not cond_id:
@@ -236,32 +212,44 @@ def load_candle_data(market_id, markets_df):
                 data = json.load(f)
             if not data:
                 return None
-            # Handle nested list format: data[0] is list of candle dicts
             if isinstance(data, list) and len(data) > 0 and isinstance(data[0], list):
-                data = data[0]
+                flat = []
+                for sublist in data:
+                    if isinstance(sublist, list):
+                        flat.extend(sublist)
+                data = flat
             if not data or not isinstance(data, list):
                 return None
-            # Parse Polymarket candle format
             rows = []
             for item in data:
+                if not isinstance(item, dict):
+                    continue
                 ts = item.get('end_period_ts')
                 price = item.get('price', {})
-                close_str = price.get('close_dollars', None)
+                if isinstance(price, dict):
+                    close_str = price.get('close_dollars', None)
+                else:
+                    close_str = None
                 vol = item.get('volume', 0)
                 if ts and close_str:
-                    rows.append({
-                        'date': pd.to_datetime(ts, unit='s', errors='coerce'),
-                        'close': float(close_str),
-                        'volume': vol,
-                    })
+                    try:
+                        rows.append({
+                            'date': pd.to_datetime(int(ts), unit='s', errors='coerce'),
+                            'close': float(close_str),
+                            'volume': float(vol) if vol else 0,
+                        })
+                    except (ValueError, TypeError):
+                        continue
             if not rows:
-                # Try flat format (t/c keys)
-                df = pd.DataFrame(data)
-                if 't' in df.columns:
-                    df['date'] = pd.to_datetime(df['t'], unit='s', errors='coerce')
-                    df['close'] = pd.to_numeric(df.get('c', 0), errors='coerce')
-                    df['volume'] = pd.to_numeric(df.get('v', 0), errors='coerce')
-                else:
+                try:
+                    df = pd.DataFrame(data)
+                    if 't' in df.columns:
+                        df['date'] = pd.to_datetime(df['t'], unit='s', errors='coerce')
+                        df['close'] = pd.to_numeric(df.get('c', 0), errors='coerce')
+                        df['volume'] = pd.to_numeric(df.get('v', 0), errors='coerce')
+                    else:
+                        return None
+                except:
                     return None
             else:
                 df = pd.DataFrame(rows)
@@ -270,7 +258,7 @@ def load_candle_data(market_id, markets_df):
             return df[['date', 'close', 'volume']].reset_index(drop=True)
         except:
             return None
-    
+
     elif 'kalshi' in str(market_id).lower() or platform == 'kalshi':
         ticker = row.get('ticker', '')
         if not ticker:
@@ -294,31 +282,116 @@ def load_candle_data(market_id, markets_df):
             return daily[['date', 'close', 'volume']].reset_index(drop=True)
         except:
             return None
-    
+
     return None
 
 
+def normalize_probability_at_roll(combined, cusip_data):
+    """
+    Normalize probabilities across contract rolls using annualized rate.
+    
+    At each roll point, converts contract probabilities to annualized rates
+    using: P_annualized = 1 - (1 - P_contract)^(365 / days_to_expiry)
+    
+    Then applies ratio adjustment so the series is continuous.
+    """
+    if len(combined) < 2:
+        return combined
+    
+    combined = combined.copy()
+    
+    # Build a lookup: market_id -> end_date
+    end_dates = {}
+    for cd in cusip_data:
+        end_dates[cd['market_id']] = cd['end_date']
+    
+    # Find roll points
+    roll_indices = combined.index[combined['is_roll']].tolist()
+    
+    for ri in roll_indices:
+        if ri == 0:
+            continue
+        
+        prev_idx = ri - 1
+        prev_close = combined.loc[prev_idx, 'close']
+        curr_close = combined.loc[ri, 'close']
+        
+        prev_cusip = combined.loc[prev_idx, 'cusip']
+        curr_cusip = combined.loc[ri, 'cusip']
+        curr_date = combined.loc[ri, 'date']
+        
+        prev_end = end_dates.get(prev_cusip)
+        curr_end = end_dates.get(curr_cusip)
+        
+        # Try annualized normalization
+        if pd.notna(prev_end) and pd.notna(curr_end):
+            prev_days = max((prev_end - curr_date).days, 1)
+            curr_days = max((curr_end - curr_date).days, 1)
+            
+            # Convert both to annualized probability
+            prev_ann = 1 - (1 - np.clip(prev_close, 0.001, 0.999)) ** (365.0 / prev_days)
+            curr_ann = 1 - (1 - np.clip(curr_close, 0.001, 0.999)) ** (365.0 / curr_days)
+            
+            if curr_ann > 0.001:
+                ratio = prev_ann / curr_ann
+            else:
+                ratio = 1.0
+        else:
+            # Fallback: simple ratio to eliminate jump
+            if curr_close > 0.001:
+                ratio = prev_close / curr_close
+            else:
+                ratio = 1.0
+        
+        # Clamp ratio to avoid extreme adjustments
+        ratio = np.clip(ratio, 0.5, 2.0)
+        
+        # Apply ratio to all points from this roll onward until next roll
+        # Find next roll point
+        later_rolls = [r for r in roll_indices if r > ri]
+        next_roll = later_rolls[0] if later_rolls else len(combined)
+        
+        mask = (combined.index >= ri) & (combined.index < next_roll)
+        combined.loc[mask, 'close'] = combined.loc[mask, 'close'] * ratio
+    
+    # Clip to valid probability range
+    combined['close'] = combined['close'].clip(0, 1)
+    
+    # Flag remaining jumps > 20% as data quality issues
+    combined['daily_change'] = combined['close'].diff().abs()
+    bad_jumps = combined['daily_change'] > 0.20
+    num_bad = bad_jumps.sum()
+    
+    # Interpolate over bad jumps (not at roll points, those are already handled)
+    bad_non_roll = bad_jumps & ~combined['is_roll']
+    if bad_non_roll.any():
+        combined.loc[bad_non_roll, 'close'] = np.nan
+        combined['close'] = combined['close'].interpolate(method='linear')
+        combined['close'] = combined['close'].ffill().bfill()
+    
+    combined = combined.drop(columns=['daily_change'], errors='ignore')
+    return combined
+
+
 def build_ticker_timeseries(ticker_chains, markets_df, min_days=30):
-    """Build continuous time series for rollable Tickers."""
+    """Build continuous time series for rollable Tickers with normalization."""
     print("\n" + "=" * 60)
     print("STEP 3: Building Ticker time series")
     print("=" * 60)
-    
+
     rollable = {k: v for k, v in ticker_chains.items() if v['market_count'] >= 2}
     print(f"  Processing {len(rollable)} rollable Tickers...")
-    
+
     all_raw = []
-    all_adjusted = []
     stats = {}
     success = 0
     no_data = 0
     too_short = 0
-    
+
     for i, (tid, chain) in enumerate(rollable.items()):
         if (i + 1) % 200 == 0:
             print(f"  ... {i+1}/{len(rollable)}")
-        
-        # Load candle data for each CUSIP in the chain
+
         cusip_data = []
         for m in chain['markets']:
             df = load_candle_data(m['market_id'], markets_df)
@@ -330,24 +403,21 @@ def build_ticker_timeseries(ticker_chains, markets_df, min_days=30):
                     'end_date': end_date,
                     'data': df,
                 })
-        
+
         if not cusip_data:
             no_data += 1
             continue
-        
-        # Sort by end_date
+
         cusip_data.sort(key=lambda x: x['end_date'] if pd.notna(x['end_date']) else pd.Timestamp.max)
-        
-        # Front-month rolling: use nearest expiry
+
         combined_rows = []
         used_dates = set()
-        
+
         for ci, cusip in enumerate(cusip_data):
             df = cusip['data']
             is_last = (ci == len(cusip_data) - 1)
-            
+
             if is_last:
-                # Last CUSIP: use all remaining dates
                 for _, row in df.iterrows():
                     d = row['date'].date() if hasattr(row['date'], 'date') else row['date']
                     if d not in used_dates:
@@ -360,15 +430,11 @@ def build_ticker_timeseries(ticker_chains, markets_df, min_days=30):
                         })
                         used_dates.add(d)
             else:
-                # Use until end_date or next CUSIP starts
-                next_start = cusip_data[ci + 1]['data']['date'].min() if ci + 1 < len(cusip_data) else None
                 end = cusip['end_date']
-                
                 for _, row in df.iterrows():
                     d = row['date'].date() if hasattr(row['date'], 'date') else row['date']
                     if d in used_dates:
                         continue
-                    # Use this CUSIP's data up to its end date
                     if pd.notna(end) and row['date'] > end:
                         continue
                     combined_rows.append({
@@ -379,237 +445,186 @@ def build_ticker_timeseries(ticker_chains, markets_df, min_days=30):
                         'is_roll': False,
                     })
                     used_dates.add(d)
-        
+
         if len(combined_rows) < min_days:
             too_short += 1
             continue
-        
+
         combined = pd.DataFrame(combined_rows).sort_values('date').reset_index(drop=True)
-        
-        # Mark roll points
+
         combined['is_roll'] = combined['cusip'] != combined['cusip'].shift(1)
         combined.iloc[0, combined.columns.get_loc('is_roll')] = False
-        
-        # Raw series
+
+        # Store original roll points before normalization
+        roll_count_raw = int(combined['is_roll'].sum())
+
+        # Normalize probabilities across rolls
+        combined = normalize_probability_at_roll(combined, cusip_data)
+
         combined['ticker_id'] = tid
         combined['ticker_name'] = chain['ticker_name']
         all_raw.append(combined)
-        
-        # Adjusted series (return-chained)
-        adj = combined.copy()
-        adj['daily_return'] = adj['close'].diff()
-        # Zero out returns at roll points
-        adj.loc[adj['is_roll'], 'daily_return'] = 0
-        adj['daily_return'].iloc[0] = 0
-        adj['adjusted_close'] = adj['close'].iloc[0] + adj['daily_return'].cumsum()
-        all_adjusted.append(adj)
-        
-        # Stats
-        roll_count = combined['is_roll'].sum()
+
         stats[tid] = {
             'ticker_name': chain['ticker_name'],
             'cusip_count': chain['market_count'],
             'data_points': len(combined),
             'duration_days': (combined['date'].max() - combined['date'].min()).days,
-            'roll_count': int(roll_count),
+            'roll_count': roll_count_raw,
             'start_date': str(combined['date'].min().date()),
             'end_date': str(combined['date'].max().date()),
             'category': chain.get('category', ''),
         }
         success += 1
-    
+
     print(f"\n  Results:")
     print(f"    Successful: {success}")
     print(f"    No data: {no_data}")
     print(f"    Too short (<{min_days}d): {too_short}")
-    
+
     raw_df = pd.concat(all_raw, ignore_index=True) if all_raw else pd.DataFrame()
-    adj_df = pd.concat(all_adjusted, ignore_index=True) if all_adjusted else pd.DataFrame()
-    
     print(f"    Total data points: {len(raw_df):,}")
-    print(f"    Total roll points: {raw_df['is_roll'].sum() if len(raw_df) > 0 else 0}")
-    
-    return raw_df, adj_df, stats
+
+    return raw_df, stats
 
 
 # =============================================================================
-# STEP 4: Generate individual ticker charts
+# STEP 4: Select top 20 most modelable tickers
+# =============================================================================
+
+def select_top_modelable(raw_df, stats, top_n=20):
+    """
+    Rank tickers by modelability score and select top N.
+    Score = data_points * (1 / (1 + num_jumps)) * time_span_days
+    """
+    print("\n" + "=" * 60)
+    print(f"STEP 4: Selecting top {top_n} most modelable tickers")
+    print("=" * 60)
+
+    scores = {}
+    for tid, s in stats.items():
+        dp = s['data_points']
+        rolls = s['roll_count']
+        span = max(s['duration_days'], 1)
+
+        # Compute smoothness: std of daily changes
+        ticker_data = raw_df[raw_df['ticker_id'] == tid].sort_values('date')
+        daily_changes = ticker_data['close'].diff().abs()
+        smoothness = daily_changes.mean() if len(daily_changes) > 1 else 1.0
+        smoothness = max(smoothness, 0.001)
+
+        score = dp * (1.0 / (1 + rolls)) * span * (1.0 / (1 + smoothness * 10))
+        scores[tid] = score
+
+    ranked = sorted(scores.items(), key=lambda x: x[1], reverse=True)
+    top_tids = [tid for tid, _ in ranked[:top_n]]
+
+    print(f"\n  Top {top_n} tickers selected:")
+    print(f"  {'Rank':<5} {'Score':>10} {'Days':>6} {'Pts':>6} {'Rolls':>6}  {'Ticker Name'}")
+    print(f"  {'-'*5} {'-'*10} {'-'*6} {'-'*6} {'-'*6}  {'-'*40}")
+    for rank, tid in enumerate(top_tids, 1):
+        s = stats[tid]
+        sc = scores[tid]
+        print(f"  {rank:<5} {sc:>10.0f} {s['duration_days']:>6} {s['data_points']:>6} {s['roll_count']:>6}  {s['ticker_name'][:60]}")
+
+    return top_tids
+
+
+# =============================================================================
+# STEP 5: Generate clean charts
 # =============================================================================
 
 def sanitize_filename(name):
     """Sanitize ticker name for use as filename."""
-    # Remove or replace characters that aren't safe for filenames
-    name = re.sub(r'[<>:"/\\|?*]', '_', name)  # Windows-unsafe chars
-    name = re.sub(r'[^\w\s\-_\.]', '_', name)  # Keep only word chars, spaces, hyphens, underscores, dots
-    name = re.sub(r'\s+', '_', name)  # Replace spaces with underscores
-    name = re.sub(r'_{2,}', '_', name)  # Replace multiple underscores with single
-    name = name.strip('_')  # Remove leading/trailing underscores
-    return name[:100]  # Limit length to 100 chars
+    name = re.sub(r'[<>:"/\\|?*]', '_', name)
+    name = re.sub(r'[^\w\s\-_\.]', '_', name)
+    name = re.sub(r'\s+', '_', name)
+    name = re.sub(r'_{2,}', '_', name)
+    name = name.strip('_')
+    return name[:100]
 
 
-def generate_ticker_charts(raw_df, stats):
-    """Generate one PNG chart per Ticker showing time series with roll points."""
+def generate_ticker_charts(raw_df, stats, top_tids):
+    """Generate one clean PNG chart per top ticker."""
     print("\n" + "=" * 60)
-    print("STEP 4: Generating Ticker charts")
+    print("STEP 5: Generating charts for top tickers")
     print("=" * 60)
-    
+
+    # Clear old charts
+    for f in CHARTS_DIR.glob('*.png'):
+        f.unlink()
+
     if raw_df.empty:
         print("  No data for charts")
         return
-    
-    unique_tickers = raw_df['ticker_id'].unique()
-    print(f"  Generating {len(unique_tickers)} charts...")
-    
-    generated = 0
-    skipped = 0
-    
-    for i, ticker_id in enumerate(unique_tickers):
-        if (i + 1) % 50 == 0:
-            print(f"  ... {i+1}/{len(unique_tickers)}")
-        
-        # Get data for this ticker
+
+    print(f"  Generating {len(top_tids)} charts...")
+
+    for rank, ticker_id in enumerate(top_tids, 1):
         ticker_data = raw_df[raw_df['ticker_id'] == ticker_id].sort_values('date')
         if ticker_data.empty:
-            skipped += 1
             continue
-            
+
         ticker_name = ticker_data['ticker_name'].iloc[0]
         ticker_stats = stats.get(ticker_id, {})
-        
-        # Create chart
-        fig, ax = plt.subplots(figsize=(12, 7))
-        
-        # Plot main time series
-        ax.plot(ticker_data['date'], ticker_data['close'], 
-                linewidth=1.5, color='#2c3e50', label='Price')
-        
-        # Mark roll points
+
+        fig, ax = plt.subplots(figsize=(14, 7))
+
+        # Main line - raw data, no smoothing
+        ax.plot(ticker_data['date'], ticker_data['close'],
+                linewidth=1.2, color='#2c3e50', zorder=3)
+
+        # Roll points - subtle
         rolls = ticker_data[ticker_data['is_roll']]
         if len(rolls) > 0:
-            ax.scatter(rolls['date'], rolls['close'], 
-                      color='#e74c3c', s=50, zorder=5, label='Roll Points')
-        
-        # Formatting
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Probability')
-        ax.set_ylim(-0.05, 1.05)
-        ax.set_title(ticker_name, fontsize=14, fontweight='bold')
-        
+            for _, roll_row in rolls.iterrows():
+                ax.axvline(x=roll_row['date'], color='#bdc3c7', linewidth=0.8,
+                          linestyle=':', alpha=0.6, zorder=1)
+
+        # Y-axis
+        ax.set_ylabel('Probability', fontsize=13)
+        ax.set_ylim(-0.02, 1.02)
+        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda y, _: f'{y:.0%}'))
+
+        # X-axis with prominent year labels
+        ax.xaxis.set_major_locator(mdates.YearLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+        ax.xaxis.set_minor_locator(mdates.MonthLocator(bymonth=[1, 4, 7, 10]))
+        ax.xaxis.set_minor_formatter(mdates.DateFormatter('%b'))
+
+        # Make year labels prominent
+        ax.tick_params(axis='x', which='major', labelsize=14, length=8, width=1.5, pad=8)
+        ax.tick_params(axis='x', which='minor', labelsize=9, length=4, colors='#888888')
+
+        ax.set_xlabel('', fontsize=1)  # No xlabel, year is self-explanatory
+
+        # Title
+        ax.set_title(ticker_name, fontsize=15, fontweight='bold', pad=15)
+
         # Subtitle with stats
         duration = ticker_stats.get('duration_days', 0)
         data_points = ticker_stats.get('data_points', 0)
-        roll_count = ticker_stats.get('roll_count', 0)
-        subtitle = f"Duration: {duration} days | Data points: {data_points:,} | Rolls: {roll_count}"
-        ax.text(0.5, 0.95, subtitle, transform=ax.transAxes, 
-                ha='center', va='top', fontsize=10, style='italic')
-        
-        # Date formatting
-        if len(ticker_data) > 365:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m'))
-            ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-        else:
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%m/%d'))
-        
-        # Legend if there are roll points
-        if len(rolls) > 0:
-            ax.legend()
-        
-        # Grid
-        ax.grid(True, alpha=0.3)
-        
+        cat = ticker_stats.get('category', '')
+        subtitle = f"{cat} · {duration}d span · {data_points:,} data points"
+        ax.text(0.5, 1.01, subtitle, transform=ax.transAxes,
+                ha='center', va='bottom', fontsize=10, color='#888888')
+
+        # Clean grid
+        ax.grid(True, which='major', alpha=0.15, linestyle='-')
+        ax.grid(True, which='minor', alpha=0.08, linestyle='-')
+
+        # Remove top and right spines
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+
         plt.tight_layout()
-        
-        # Save with sanitized filename
-        filename = sanitize_filename(ticker_name) + '.png'
+
+        filename = f"{rank:02d}_{sanitize_filename(ticker_name)}.png"
         filepath = CHARTS_DIR / filename
-        plt.savefig(filepath, dpi=150, bbox_inches='tight')
+        plt.savefig(filepath, dpi=150, bbox_inches='tight', facecolor='white')
         plt.close()
-        
-        generated += 1
-    
-    print(f"  Generated: {generated} charts")
-    print(f"  Skipped: {skipped} tickers")
 
-
-# =============================================================================
-# STEP 5: Write Excel with one sheet per ticker
-# =============================================================================
-
-def write_ticker_excel(raw_df, stats, markets, category_counts):
-    """Write results.xlsx with one sheet per Ticker plus Summary."""
-    print("\n" + "=" * 60)
-    print("STEP 5: Writing results.xlsx")
-    print("=" * 60)
-    
-    xlsx_path = OUTPUT_DIR / 'results.xlsx'
-    
-    if raw_df.empty:
-        print("  No time series data for Excel")
-        return
-    
-    with pd.ExcelWriter(xlsx_path, engine='openpyxl') as writer:
-        # Summary sheet first
-        summary_rows = []
-        for ticker_id, s in stats.items():
-            summary_rows.append({
-                'Ticker ID': ticker_id,
-                'Ticker Name': s['ticker_name'],
-                'Duration (days)': s['duration_days'], 
-                'Data Points': s['data_points'],
-                'Rolls': s['roll_count'],
-                'Start Date': s['start_date'],
-                'End Date': s['end_date'],
-            })
-        
-        summary_df = pd.DataFrame(summary_rows).sort_values('Data Points', ascending=False)
-        summary_df.to_excel(writer, sheet_name='Summary', index=False)
-        print(f"  ✓ Summary sheet with {len(summary_df)} tickers")
-        
-        # One sheet per ticker
-        unique_tickers = raw_df['ticker_id'].unique()
-        print(f"  Creating {len(unique_tickers)} ticker sheets...")
-        
-        created = 0
-        skipped = 0
-        
-        for i, ticker_id in enumerate(unique_tickers):
-            if (i + 1) % 50 == 0:
-                print(f"  ... {i+1}/{len(unique_tickers)}")
-            
-            # Get data for this ticker
-            ticker_data = raw_df[raw_df['ticker_id'] == ticker_id].sort_values('date')
-            if ticker_data.empty:
-                skipped += 1
-                continue
-            
-            ticker_name = ticker_data['ticker_name'].iloc[0]
-            
-            # Prepare sheet data
-            sheet_data = ticker_data[['date', 'close', 'volume', 'cusip', 'is_roll']].copy()
-            sheet_data.columns = ['Date', 'Price', 'Volume', 'Active CUSIP', 'Is Roll Point']
-            
-            # Sheet name (Excel limits to 31 chars)
-            sheet_name = sanitize_filename(ticker_name)[:31]
-            
-            # Handle duplicate sheet names
-            base_sheet_name = sheet_name
-            counter = 1
-            while sheet_name in [ws.title for ws in writer.book.worksheets]:
-                sheet_name = f"{base_sheet_name[:28]}_{counter}"
-                counter += 1
-            
-            try:
-                sheet_data.to_excel(writer, sheet_name=sheet_name, index=False)
-                created += 1
-            except Exception as e:
-                print(f"  Warning: Could not create sheet for {ticker_name}: {e}")
-                skipped += 1
-        
-        print(f"  ✓ Created {created} ticker sheets")
-        if skipped > 0:
-            print(f"  ✗ Skipped {skipped} sheets")
-    
-    print(f"  ✓ {xlsx_path}")
+    print(f"  Generated: {len(top_tids)} charts in {CHARTS_DIR}/")
 
 
 # =============================================================================
@@ -621,41 +636,41 @@ def main():
     print("  PREDICTION MARKET TICKER TIME SERIES")
     print("  " + datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
     print("=" * 60)
-    
-    # Step 1: Load markets
+
+    # Step 1: Load markets (geo+finance only)
     markets, filtered, category_counts = load_markets()
-    
-    # Step 2: Build ticker mapping
-    mapping_df, ticker_chains = build_ticker_mapping(markets)
-    
-    # Step 3: Build time series
-    raw_df, adj_df, stats = build_ticker_timeseries(ticker_chains, markets)
-    
-    # Step 4: Generate individual ticker charts
-    generate_ticker_charts(raw_df, stats)
-    
-    # Step 5: Write Excel with one sheet per ticker
-    write_ticker_excel(raw_df, stats, markets, category_counts)
-    
+
+    # Step 2: Build ticker mapping (on filtered data)
+    mapping_df, ticker_chains = build_ticker_mapping(filtered)
+
+    # Step 3: Build time series with normalization
+    raw_df, stats = build_ticker_timeseries(ticker_chains, markets)
+
+    # Step 4: Select top 20 most modelable
+    top_tids = select_top_modelable(raw_df, stats, top_n=20)
+
+    # Step 5: Generate charts for top 20 only
+    generate_ticker_charts(raw_df, stats, top_tids)
+
+    # Save results
+    results = {
+        'top_20_tickers': [
+            {'rank': i+1, 'ticker_id': tid, **stats[tid]}
+            for i, tid in enumerate(top_tids)
+        ],
+        'total_geo_finance_tickers': len(stats),
+        'generated_at': datetime.now().isoformat(),
+    }
+    with open(OUTPUT_DIR / 'top20_results.json', 'w') as f:
+        json.dump(results, f, indent=2)
+
     print("\n" + "=" * 60)
     print("  SUMMARY")
     print("=" * 60)
-    
-    if stats:
-        print(f"  Total Tickers with time series: {len(stats)}")
-        print(f"  Charts generated: {len([f for f in CHARTS_DIR.glob('*.png')])}")
-        print(f"  Excel sheets: {len(stats) + 1} (1 summary + {len(stats)} tickers)")
-        print(f"  Total data points: {sum(s['data_points'] for s in stats.values()):,}")
-        print(f"  Total roll points: {sum(s['roll_count'] for s in stats.values())}")
-        
-        # Date range
-        start_dates = [s['start_date'] for s in stats.values()]
-        end_dates = [s['end_date'] for s in stats.values()]
-        print(f"  Data range: {min(start_dates)} to {max(end_dates)}")
-    else:
-        print("  No time series data generated")
-    
-    print("\n" + "=" * 60)
+    print(f"  Total geo+finance tickers with time series: {len(stats)}")
+    print(f"  Top 20 charts generated in: {CHARTS_DIR}/")
+    print(f"  Results saved to: {OUTPUT_DIR}/top20_results.json")
+    print("=" * 60)
     print("  DONE")
     print("=" * 60)
 
